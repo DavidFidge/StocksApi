@@ -1,9 +1,10 @@
 using System;
 
-namespace StockApi
+namespace StocksApi
 {
     public class EndOfDay
     {
+        public Guid Id { get; set; }
         public Stock Stock { get; set; }
         public DateTime Date { get; set; }
         public Decimal Open { get; set; }

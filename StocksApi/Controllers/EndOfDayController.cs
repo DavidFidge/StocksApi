@@ -4,37 +4,46 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace StockApi.Controllers
+namespace StocksApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class StockController : ControllerBase
+    public class EndOfDayController : ControllerBase
     {
-        private readonly ILogger<StockController> _logger;
+        private readonly ILogger<EndOfDayController> _logger;
+        private static IList<EndOfDay> _endOfDayCache;
 
-        public StockController(ILogger<StockController> logger)
+        public EndOfDayController(ILogger<EndOfDayController> logger)
         {
             _logger = logger;
         }
 
         [HttpGet]
+        [EnableQuery]
         public async Task<IEnumerable<EndOfDay>> Get()
         {
-            return await GetStockEndOfDays();
+            if (_endOfDayCache == null)
+                await GetStockEndOfDays();
+
+            return _endOfDayCache;
         }
 
-        public async Task<List<EndOfDay>> GetStockEndOfDays()
+        private async Task GetStockEndOfDays()
         {
-            var files = Directory.EnumerateFiles("C:\\dev\\StockApi\\StockApi\\csv");
+            var files = Directory.EnumerateFiles("C:\\dev\\StocksApi\\StocksApi\\csv", "*.txt");
 
             var endOfDays = new List<EndOfDay>();
             var stocks = new Dictionary<string, Stock>();
 
             foreach (var file in files)
             {
+                _logger.LogInformation($"Processing {file}");
+
                 var endOfDayLines = await System.IO.File.ReadAllLinesAsync(file);
 
                 foreach (var endOfDayLine in endOfDayLines)
@@ -48,14 +57,16 @@ namespace StockApi.Controllers
                         stocks.Add(
                             stockCode, new Stock
                             {
-                                Code = stockCode, Description = stockCode
-
+                                Id = Guid.NewGuid(),
+                                Code = stockCode,
+                                Description = stockCode
                             });
                     }
-
+                    
                     endOfDays.Add(
                         new EndOfDay
                         {
+                            Id = Guid.NewGuid(),
                             Stock = stocks[stockCode],
                             Date = DateTime.ParseExact(endOfDaySplit[1], "yyyyMMdd", CultureInfo.InvariantCulture),
                             Open = Decimal.Parse(endOfDaySplit[2]),
@@ -67,7 +78,7 @@ namespace StockApi.Controllers
                 }
             }
 
-            return endOfDays;
+            _endOfDayCache = endOfDays;
         }
     }
 }

@@ -1,9 +1,10 @@
 using System;
 
-namespace StockApi
+namespace StocksApi
 {
     public class Stock
     {
+        public Guid Id { get; set; }
         public string Code { get; set; }
         public string Description { get; set; }
     }
