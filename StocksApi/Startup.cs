@@ -26,6 +26,16 @@ namespace StocksApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IRepository, Repository>();
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:5000");
+                    });
+            });
+
             services.AddOData();
             services.AddControllers();
 
@@ -40,13 +50,14 @@ namespace StocksApi
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            if (env.IsDevelopment())
+                app.UseCors();
 
             app.UseAuthorization();
 
