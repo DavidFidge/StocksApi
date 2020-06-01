@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using StocksApi.Models;
 
 namespace StocksApi
 {
@@ -24,6 +25,7 @@ namespace StocksApi
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IRepository, Repository>();
             services.AddOData();
             services.AddControllers();
 

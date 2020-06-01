@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace StocksApi
+namespace StocksApi.Models
 {
     public class EndOfDay
     {

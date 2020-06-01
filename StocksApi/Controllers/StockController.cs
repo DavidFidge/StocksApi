@@ -12,12 +12,12 @@ namespace StocksApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class EndOfDayController : ControllerBase
+    public class StockController : ControllerBase
     {
-        private readonly ILogger<EndOfDayController> _logger;
+        private readonly ILogger<StockController> _logger;
         private readonly IRepository _repository;
 
-        public EndOfDayController(ILogger<EndOfDayController> logger, IRepository repository)
+        public StockController(ILogger<StockController> logger, IRepository repository)
         {
             _logger = logger;
             _repository = repository;
@@ -25,9 +25,9 @@ namespace StocksApi.Controllers
 
         [HttpGet]
         [EnableQuery]
-        public async Task<IQueryable<EndOfDay>> Get()
+        public async Task<IQueryable<Stock>> Get()
         {
-            return await _repository.GetEndOfDay();
+            return await _repository.GetStocks();
         }
     }
 }
