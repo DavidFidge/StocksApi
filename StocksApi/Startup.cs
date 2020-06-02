@@ -10,6 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+
+using Serilog;
+
 using StocksApi.Models;
 
 namespace StocksApi
@@ -53,6 +56,8 @@ namespace StocksApi
                 app.UseDeveloperExceptionPage();
 
             app.UseHttpsRedirection();
+
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 
