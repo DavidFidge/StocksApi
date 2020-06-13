@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StocksApi.Data;
@@ -11,48 +12,48 @@ namespace StocksApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EndOfDayController : ControllerBase
+    public class StocksController : ControllerBase
     {
         private readonly StocksDatabaseContext _context;
 
-        public EndOfDayController(StocksDatabaseContext context)
+        public StocksController(StocksDatabaseContext context)
         {
             _context = context;
         }
 
-        // GET: api/EndOfDayController2
+        // GET: api/StocksController2
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EndOfDay>>> GetEndOfDay()
+        public async Task<ActionResult<IEnumerable<Stock>>> GetStock()
         {
-            return await _context.EndOfDay.ToListAsync();
+            return await _context.Stock.ToListAsync();
         }
 
-        // GET: api/EndOfDayController2/5
+        // GET: api/StocksController2/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<EndOfDay>> GetEndOfDay(Guid id)
+        public async Task<ActionResult<Stock>> GetStock(Guid id)
         {
-            var endOfDay = await _context.EndOfDay.FindAsync(id);
+            var stock = await _context.Stock.FindAsync(id);
 
-            if (endOfDay == null)
+            if (stock == null)
             {
                 return NotFound();
             }
 
-            return endOfDay;
+            return stock;
         }
 
-        // PUT: api/EndOfDayController2/5
+        // PUT: api/StocksController2/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEndOfDay(Guid id, EndOfDay endOfDay)
+        public async Task<IActionResult> PutStock(Guid id, Stock stock)
         {
-            if (id != endOfDay.Id)
+            if (id != stock.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(endOfDay).State = EntityState.Modified;
+            _context.Entry(stock).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +61,7 @@ namespace StocksApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EndOfDayExists(id))
+                if (!StockExists(id))
                 {
                     return NotFound();
                 }
@@ -73,37 +74,37 @@ namespace StocksApi.Controllers
             return NoContent();
         }
 
-        // POST: api/EndOfDayController2
+        // POST: api/StocksController2
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<EndOfDay>> PostEndOfDay(EndOfDay endOfDay)
+        public async Task<ActionResult<Stock>> PostStock(Stock stock)
         {
-            _context.EndOfDay.Add(endOfDay);
+            _context.Stock.Add(stock);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEndOfDay", new { id = endOfDay.Id }, endOfDay);
+            return CreatedAtAction("GetStock", new { id = stock.Id }, stock);
         }
 
-        // DELETE: api/EndOfDayController2/5
+        // DELETE: api/StocksController2/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<EndOfDay>> DeleteEndOfDay(Guid id)
+        public async Task<ActionResult<Stock>> DeleteStock(Guid id)
         {
-            var endOfDay = await _context.EndOfDay.FindAsync(id);
-            if (endOfDay == null)
+            var stock = await _context.Stock.FindAsync(id);
+            if (stock == null)
             {
                 return NotFound();
             }
 
-            _context.EndOfDay.Remove(endOfDay);
+            _context.Stock.Remove(stock);
             await _context.SaveChangesAsync();
 
-            return endOfDay;
+            return stock;
         }
 
-        private bool EndOfDayExists(Guid id)
+        private bool StockExists(Guid id)
         {
-            return _context.EndOfDay.Any(e => e.Id == id);
+            return _context.Stock.Any(e => e.Id == id);
         }
     }
 }

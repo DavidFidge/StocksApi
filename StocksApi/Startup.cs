@@ -1,10 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Formatter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,6 +14,7 @@ using Microsoft.OpenApi.Models;
 
 using Serilog;
 
+using StocksApi.Data;
 using StocksApi.Models;
 
 namespace StocksApi
@@ -22,6 +24,10 @@ namespace StocksApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            using var client = new StocksDatabaseContext(new DbContextOptions<StocksDatabaseContext>());
+
+            client.Database.EnsureCreated();
         }
 
         public IConfiguration Configuration { get; }
@@ -48,6 +54,10 @@ namespace StocksApi
             });
             
             SetOutputFormatters(services);
+
+            services
+                .AddEntityFrameworkSqlite()
+                .AddDbContext<StocksDatabaseContext>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
