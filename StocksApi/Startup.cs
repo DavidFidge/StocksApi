@@ -24,10 +24,6 @@ namespace StocksApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
-            using var client = new StocksDatabaseContext(new DbContextOptions<StocksDatabaseContext>());
-
-            client.Database.EnsureCreated();
         }
 
         public IConfiguration Configuration { get; }
@@ -57,7 +53,10 @@ namespace StocksApi
 
             services
                 .AddEntityFrameworkSqlite()
-                .AddDbContext<StocksDatabaseContext>();
+                .AddDbContext<StocksContext>( o =>
+                    o.UseSqlite(Configuration.GetConnectionString("StocksDb"))
+                        .EnableSensitiveDataLogging()
+                    );
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

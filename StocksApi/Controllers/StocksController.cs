@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StocksApi.Data;
-using StocksApi.Models;
+using StocksApi.Model;
 
 namespace StocksApi.Controllers
 {
@@ -14,9 +14,9 @@ namespace StocksApi.Controllers
     [ApiController]
     public class StocksController : ControllerBase
     {
-        private readonly StocksDatabaseContext _context;
+        private readonly StocksContext _context;
 
-        public StocksController(StocksDatabaseContext context)
+        public StocksController(StocksContext context)
         {
             _context = context;
         }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StocksApi.Data;
-using StocksApi.Models;
+using StocksApi.Model;
 
 namespace StocksApi.Controllers
 {
@@ -13,9 +13,9 @@ namespace StocksApi.Controllers
     [ApiController]
     public class EndOfDayController : ControllerBase
     {
-        private readonly StocksDatabaseContext _context;
+        private readonly StocksContext _context;
 
-        public EndOfDayController(StocksDatabaseContext context)
+        public EndOfDayController(StocksContext context)
         {
             _context = context;
         }

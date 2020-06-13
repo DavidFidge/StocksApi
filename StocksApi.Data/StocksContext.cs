@@ -1,18 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
-using StocksApi.Models;
+using StocksApi.Model;
 
 namespace StocksApi.Data
 {
-    public class StocksDatabaseContext : DbContext
+    public class StocksContext : DbContext
     {
-        public StocksDatabaseContext(DbContextOptions<StocksDatabaseContext> options)
-            : base(options)
-        {
-        }
-
         public DbSet<EndOfDay> EndOfDay { get; set; }
         public DbSet<Stock> Stock { get; set; }
+
+        public StocksContext(DbContextOptions<StocksContext> options)
+        : base(options)
+        {
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
