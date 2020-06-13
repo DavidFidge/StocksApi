@@ -20,7 +20,7 @@ namespace StocksApi
                 //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341")
+                .WriteTo.Seq(Environment.GetEnvironmentVariable("STOCKAPI_SEQ_URL") ?? "http://localhost:5341")
                 .CreateLogger();
 
             try
@@ -41,7 +41,7 @@ namespace StocksApi
         private static LogEventLevel GetLogEventLevel()
         {
             var defaultLevel = LogEventLevel.Information;
-            var logLevel = Environment.GetEnvironmentVariable("LOG_LEVEL");
+            var logLevel = Environment.GetEnvironmentVariable("STOCKAPI_LOG_LEVEL");
 
             if (String.IsNullOrEmpty(logLevel))
                 return defaultLevel;

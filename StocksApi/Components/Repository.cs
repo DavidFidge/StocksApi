@@ -76,7 +76,7 @@ namespace StocksApi.Models
                             {
                                 Id = Guid.NewGuid(),
                                 Code = stockCode,
-                                Description = stockCode
+                                CompanyName = stockCode
                             });
                     }
 

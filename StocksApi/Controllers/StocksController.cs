@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StocksApi.Data;
 using StocksApi.Model;
+using StocksApi.Service.Stock;
 
 namespace StocksApi.Controllers
 {
@@ -15,10 +16,12 @@ namespace StocksApi.Controllers
     public class StocksController : ControllerBase
     {
         private readonly StocksContext _context;
+        private readonly ICompanyInformation _companyInformation;
 
-        public StocksController(StocksContext context)
+        public StocksController(StocksContext context, ICompanyInformation companyInformation)
         {
             _context = context;
+            _companyInformation = companyInformation;
         }
 
         // GET: api/StocksController2
@@ -70,6 +73,14 @@ namespace StocksApi.Controllers
                     throw;
                 }
             }
+
+            return NoContent();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Stock>> Update()
+        {
+            await _companyInformation.Update();
 
             return NoContent();
         }

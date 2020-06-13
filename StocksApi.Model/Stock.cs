@@ -8,7 +8,8 @@ namespace StocksApi.Model
     {
         public Guid Id { get; set; }
         public string Code { get; set; }
-        public string Description { get; set; }
+        public string CompanyName { get; set; }
+        public string IndustryGroup { get; set; }
 
         public static IEqualityComparer<Stock> EqualityComparer => new StockEqualityComparer();
     }

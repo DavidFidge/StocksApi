@@ -16,6 +16,7 @@ using Serilog;
 
 using StocksApi.Data;
 using StocksApi.Models;
+using StocksApi.Service.Stock;
 
 namespace StocksApi
 {
@@ -31,6 +32,7 @@ namespace StocksApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IRepository, Repository>();
+            services.AddSingleton<ICompanyInformation, CompanyInformation>();
 
             services.AddCors(options =>
             {
