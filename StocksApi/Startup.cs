@@ -16,7 +16,7 @@ using Serilog;
 
 using StocksApi.Data;
 using StocksApi.Models;
-using StocksApi.Service.Stock;
+using StocksApi.Service.Companies;
 
 namespace StocksApi
 {

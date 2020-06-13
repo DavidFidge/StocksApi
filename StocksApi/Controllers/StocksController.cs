@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StocksApi.Data;
 using StocksApi.Model;
-using StocksApi.Service.Stock;
+using StocksApi.Service.Companies;
 
 namespace StocksApi.Controllers
 {

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
 
-namespace StocksApi.Service.Stock
+namespace StocksApi.Service.Companies
 {
     public class FileCompanyInformationStore : BaseService<FileCompanyInformationStore>, ICompanyInformationStore
     {

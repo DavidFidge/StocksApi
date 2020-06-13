@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
+
 using StocksApi.Data;
 
-namespace StocksApi.Service.Stock
+namespace StocksApi.Service.Companies
 {
     public interface ICompanyInformation
     {
@@ -56,11 +55,11 @@ namespace StocksApi.Service.Stock
 
                     stock.CompanyName = matches[0].Groups[2].Value;
                     stock.Code = matches[1].Groups[2].Value;
-                    stock.CompanyName = matches[1].Groups[2].Value;
-
-                    _context.SaveChanges();
+                    stock.IndustryGroup = matches[2].Groups[2].Value;
                 }
             }
+
+            _context.SaveChanges();
         }
     }
 }

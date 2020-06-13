@@ -11,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StocksApi.Model", "StocksAp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StocksApi.ConsoleApp", "StocksApi.ConsoleApp\StocksApi.ConsoleApp.csproj", "{06038C1E-24D8-4193-A398-B0C8F4DBD47B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StocksApi.Service", "StocksApi.Service\StocksApi.Service.csproj", "{87F911BE-373A-476B-81A7-BA2652316B8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StocksApi.Service", "StocksApi.Service\StocksApi.Service.csproj", "{87F911BE-373A-476B-81A7-BA2652316B8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StocksApi.Service.Tests", "StocksApi.Service.Tests\StocksApi.Service.Tests.csproj", "{C10522E4-CB20-47FC-ADE0-8295ADA707F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StocksApi.Service.Tests", "StocksApi.Service.Tests\StocksApi.Service.Tests.csproj", "{C10522E4-CB20-47FC-ADE0-8295ADA707F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

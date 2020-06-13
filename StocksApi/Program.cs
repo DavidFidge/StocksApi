@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
