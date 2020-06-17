@@ -17,6 +17,7 @@ using Serilog;
 using StocksApi.Data;
 using StocksApi.Models;
 using StocksApi.Service.Companies;
+using StocksApi.Service.EndOfDayData;
 
 namespace StocksApi
 {
@@ -31,8 +32,9 @@ namespace StocksApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IRepository, Repository>();
+            services.AddSingleton<IEndOfDayUpdate, EndOfDayUpdate>();
             services.AddSingleton<ICompanyInformation, CompanyInformation>();
+            services.AddSingleton<ICompanyInformationStore, AsxCompanyInformationStore>();
 
             services.AddCors(options =>
             {
