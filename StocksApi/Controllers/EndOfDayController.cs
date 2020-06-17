@@ -20,14 +20,14 @@ namespace StocksApi.Controllers
             _context = context;
         }
 
-        // GET: api/EndOfDayController2
+        // GET: api/EndOfDayController
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EndOfDay>>> GetEndOfDay()
         {
             return await _context.EndOfDay.ToListAsync();
         }
 
-        // GET: api/EndOfDayController2/5
+        // GET: api/EndOfDayController/5
         [HttpGet("{id}")]
         public async Task<ActionResult<EndOfDay>> GetEndOfDay(Guid id)
         {
@@ -41,7 +41,7 @@ namespace StocksApi.Controllers
             return endOfDay;
         }
 
-        // PUT: api/EndOfDayController2/5
+        // PUT: api/EndOfDayController/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
@@ -73,7 +73,7 @@ namespace StocksApi.Controllers
             return NoContent();
         }
 
-        // POST: api/EndOfDayController2
+        // POST: api/EndOfDayController
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
@@ -85,7 +85,7 @@ namespace StocksApi.Controllers
             return CreatedAtAction("GetEndOfDay", new { id = endOfDay.Id }, endOfDay);
         }
 
-        // DELETE: api/EndOfDayController2/5
+        // DELETE: api/EndOfDayController/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<EndOfDay>> DeleteEndOfDay(Guid id)
         {

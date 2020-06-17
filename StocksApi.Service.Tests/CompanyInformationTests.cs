@@ -35,7 +35,7 @@ namespace StocksApi.Service.Tests
         }
 
         [TestMethod]
-        public async Task Should_GetFromStore()
+        public async Task Should_Update_Stocks_From_Store()
         {
             // Arrange
             var data = new List<Stock>();

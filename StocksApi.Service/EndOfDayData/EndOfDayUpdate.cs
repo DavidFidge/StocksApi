@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,41 +18,56 @@ namespace StocksApi.Service.EndOfDayData
 
     public class EndOfDayUpdate : BaseService<EndOfDayUpdate>, IEndOfDayUpdate
     {
-        private readonly StocksContext _stockContext;
+        private readonly StocksContext _stocksContext;
+        private readonly IEndOfDayStore _endOfDayStore;
 
         public EndOfDayUpdate(
             ILogger<EndOfDayUpdate> logger,
-            StocksContext stockContext)
+            StocksContext stocksContext,
+            IEndOfDayStore endOfDayStore)
         : base(logger)
         {
-            _stockContext = stockContext;
+            _stocksContext = stocksContext;
+            _endOfDayStore = endOfDayStore;
         }
 
         public async Task Update()
         {
-            var files = Directory.EnumerateFiles("C:\\dev\\StocksApi\\StocksApi\\csv", "*.txt");
-
-            var endOfDays = new List<EndOfDay>();
-
-            var allStocks = _stockContext
-                .Stock.ToHashSet();
-
-            foreach (var file in files)
-                await GetEndOfDaysForFile(file, allStocks, endOfDays);
+            var endOfDays = await GetEndOfDays();
 
             DeleteExistingEndOfDaysForSameDates(endOfDays);
 
-            _stockContext.AddRange(endOfDays);
-
-            _stockContext.SaveChanges();
+            _stocksContext.AddRange(endOfDays);
+            _stocksContext.SaveChanges();
         }
 
-        private async Task GetEndOfDaysForFile(
-            string file,
-            HashSet<Stock> allStocks,
-            List<EndOfDay> endOfDays)
+        private void DeleteExistingEndOfDaysForSameDates(IList<EndOfDay> endOfDays)
         {
-            var endOfDayLines = await File.ReadAllLinesAsync(file);
+            var endOfDayDates = endOfDays
+                .Select(e => e.Date)
+                .Distinct()
+                .ToList();
+
+            var endOfDaysToDelete = _stocksContext.EndOfDay
+                .Where(e => endOfDayDates.Contains(e.Date))
+                .ToList();
+
+            _stocksContext.RemoveRange(endOfDaysToDelete);
+            _stocksContext.SaveChanges();
+        }
+
+        private async Task<IList<EndOfDay>> GetEndOfDays()
+        {
+            var endOfDays = new List<EndOfDay>();
+
+            var allStocks = _stocksContext
+                .Stock
+                .ToList();
+
+            var allStocksWorking = allStocks
+                .ToHashSet(Stock.EqualityComparer);
+
+            var endOfDayLines = await _endOfDayStore.GetFromStore();
 
             foreach (var endOfDayLine in endOfDayLines)
             {
@@ -61,7 +75,7 @@ namespace StocksApi.Service.EndOfDayData
 
                 var stockCode = endOfDaySplit[0];
 
-                var stock = GetOrAddStock(allStocks, stockCode);
+                var stock = GetOrAddStock(allStocksWorking, stockCode);
 
                 endOfDays.Add(
                     new EndOfDay
@@ -75,6 +89,14 @@ namespace StocksApi.Service.EndOfDayData
                         Volume = Int64.Parse(endOfDaySplit[6])
                     });
             }
+
+            var newStocks = allStocksWorking
+                .Except(allStocks, Stock.EqualityComparer)
+                .ToList();
+
+            _stocksContext.AddRange(newStocks);
+
+            return endOfDays;
         }
 
         private Stock GetOrAddStock(HashSet<Stock> allStocks, string stockCode)
@@ -90,25 +112,9 @@ namespace StocksApi.Service.EndOfDayData
                 CompanyName = stockCode
             };
 
-            _stockContext.Add(stock);
             allStocks.Add(stock);
 
             return stock;
-        }
-
-        private void DeleteExistingEndOfDaysForSameDates(List<EndOfDay> endOfDays)
-        {
-            var endOfDayDates = endOfDays
-                .Select(e => e.Date)
-                .Distinct()
-                .ToList();
-
-            var endOfDaysToDelete = _stockContext.EndOfDay
-                .Where(e => endOfDayDates.Contains(e.Date));
-
-            _stockContext.RemoveRange(endOfDaysToDelete);
-
-            _stockContext.SaveChanges();
         }
     }
 }

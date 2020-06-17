@@ -27,6 +27,41 @@ namespace StocksApi.Service.Tests
                 .When(c => c.Add(Arg.Any<T>()))
                 .Do(ci => data.Add(ci.Arg<T>()));
 
+            context
+                .When(c => c.AddRange(Arg.Any<IEnumerable<T>>()))
+                .Do(
+                    ci =>
+                    {
+                        var list = ci.Arg<IEnumerable<T>>();
+                        foreach (var item in list)
+                        {
+                            data.Add(item);
+                        }
+                    }
+                );
+
+            return dbSet;
+        }
+
+        public static DbSet<T> WithRemove<T>(this DbSet<T> dbSet, IList<T> data, DbContext context) where T : class
+        {
+            context
+                .When(c => c.Remove(Arg.Any<T>()))
+                .Do(ci => data.Remove(ci.Arg<T>()));
+
+            context
+                .When(c => c.RemoveRange(Arg.Any<IEnumerable<T>>()))
+                .Do(
+                    ci =>
+                    {
+                        var list = ci.Arg<IEnumerable<T>>();
+                        foreach (var item in list)
+                        {
+                            data.Remove(item);
+                        }
+                    }
+                );
+
             return dbSet;
         }
     }

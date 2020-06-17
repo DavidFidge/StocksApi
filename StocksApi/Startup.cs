@@ -15,7 +15,6 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 
 using StocksApi.Data;
-using StocksApi.Models;
 using StocksApi.Service.Companies;
 using StocksApi.Service.EndOfDayData;
 
@@ -35,6 +34,8 @@ namespace StocksApi
             services.AddSingleton<IEndOfDayUpdate, EndOfDayUpdate>();
             services.AddSingleton<ICompanyInformation, CompanyInformation>();
             services.AddSingleton<ICompanyInformationStore, AsxCompanyInformationStore>();
+            services.AddSingleton<IEndOfDayUpdate, EndOfDayUpdate>();
+            services.AddSingleton<IEndOfDayStore, FileEndOfDayStore>();
 
             services.AddCors(options =>
             {

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace StocksApi.Model
 {
-    public class Stock
+    public class Stock : Entity
     {
-        public Guid Id { get; set; }
         public string Code { get; set; }
         public string CompanyName { get; set; }
         public string IndustryGroup { get; set; }

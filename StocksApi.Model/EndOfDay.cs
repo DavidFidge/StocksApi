@@ -2,9 +2,8 @@ using System;
 
 namespace StocksApi.Model
 {
-    public class EndOfDay
+    public class EndOfDay : Entity
     {
-        public Guid Id { get; set; }
         public Stock Stock { get; set; }
         public DateTime Date { get; set; }
         public Decimal Open { get; set; }
