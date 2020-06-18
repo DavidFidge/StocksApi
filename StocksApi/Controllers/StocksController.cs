@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StocksApi.Data;
@@ -26,9 +27,11 @@ namespace StocksApi.Controllers
 
         // GET: api/StocksController
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Stock>>> GetStock()
+        [EnableQuery(PageSize = 50)]
+        [ODataRoute]
+        public IQueryable<Stock> GetStock()
         {
-            return await _context.Stock.ToListAsync();
+            return _context.Stock;
         }
 
         // GET: api/StocksController/5

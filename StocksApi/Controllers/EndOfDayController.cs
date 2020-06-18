@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StocksApi.Data;
@@ -25,9 +27,11 @@ namespace StocksApi.Controllers
 
         // GET: api/EndOfDayController
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EndOfDay>>> GetEndOfDay()
+        [EnableQuery(PageSize = 3655)]
+        [ODataRoute]
+        public IQueryable<EndOfDay> GetEndOfDay()
         {
-            return await _context.EndOfDay.ToListAsync();
+            return _context.EndOfDay.Include(e => e.Stock);
         }
 
         // GET: api/EndOfDayController/5

@@ -50,8 +50,15 @@ namespace StocksApi
             services.AddOData();
             services.AddControllers();
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
+
             services.AddMvcCore(options =>
             {
+                options.EnableEndpointRouting = false;
+
                 foreach (var outputFormatter in options.OutputFormatters.OfType<OutputFormatter>().Where(x => x.SupportedMediaTypes.Count == 0))
                 {
                     outputFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/prs.odatatestxx-odata"));
@@ -62,13 +69,6 @@ namespace StocksApi
                     inputFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/prs.odatatestxx-odata"));
                 }
             });
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-            });
-            
-            SetOutputFormatters(services);
 
             services
                 .AddEntityFrameworkSqlite()
@@ -106,21 +106,6 @@ namespace StocksApi
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
-        }
-
-        private static void SetOutputFormatters(IServiceCollection services)
-        {
-            services.AddMvcCore(options =>
-            {
-                IEnumerable<ODataOutputFormatter> outputFormatters =
-                    options.OutputFormatters.OfType<ODataOutputFormatter>()
-                        .Where(foramtter => foramtter.SupportedMediaTypes.Count == 0);
-
-                foreach (var outputFormatter in outputFormatters)
-                {
-                    outputFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/odata"));
-                }
             });
         }
     }
