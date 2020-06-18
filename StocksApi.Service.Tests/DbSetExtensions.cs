@@ -21,6 +21,15 @@ namespace StocksApi.Service.Tests
             return dbSet;
         }
 
+        public static DbSet<T> WithAddRemove<T>(this DbSet<T> dbSet, IList<T> data, DbContext context) where T : class
+        {
+            dbSet
+                .WithAdd(data, context)
+                .WithRemove(data, context);
+
+            return dbSet;
+        }
+
         public static DbSet<T> WithAdd<T>(this DbSet<T> dbSet, IList<T> data, DbContext context) where T : class
         {
             context
