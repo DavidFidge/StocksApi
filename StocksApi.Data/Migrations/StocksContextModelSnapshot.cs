@@ -59,7 +59,10 @@ namespace StocksApi.Data.Migrations
                     b.Property<string>("Code")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IndustryGroup")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

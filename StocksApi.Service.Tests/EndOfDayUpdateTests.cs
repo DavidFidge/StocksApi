@@ -29,10 +29,7 @@ namespace StocksApi.Service.Tests
             _endOfDayStore = Substitute.For<IEndOfDayStore>();
             _stocksContext = Substitute.For<StocksContext>();
             
-            _endOfDayUpdate = new EndOfDayUpdate(
-                Logger,
-                _stocksContext,
-                _endOfDayStore);
+            _endOfDayUpdate = new EndOfDayUpdate(Logger, _endOfDayStore);
         }
 
         [TestMethod]
@@ -71,7 +68,7 @@ namespace StocksApi.Service.Tests
                 .Returns(endOfDays);
 
             // Act
-            await _endOfDayUpdate.Update();
+            await _endOfDayUpdate.Update(_stocksContext);
 
             // Assert
             Assert.AreEqual(1, endOfDayEntities.Count);
@@ -110,7 +107,7 @@ namespace StocksApi.Service.Tests
                 .Returns(endOfDays);
 
             // Act
-            await _endOfDayUpdate.Update();
+            await _endOfDayUpdate.Update(_stocksContext);
 
             // Assert
             Assert.AreEqual(1, stocks.Count);
@@ -163,7 +160,7 @@ namespace StocksApi.Service.Tests
                 .Returns(endOfDays);
 
             // Act
-            await _endOfDayUpdate.Update();
+            await _endOfDayUpdate.Update(_stocksContext);
 
             // Assert
             Assert.AreEqual(2, endOfDayEntities.Count);
@@ -236,7 +233,7 @@ namespace StocksApi.Service.Tests
                 .Returns(endOfDays);
 
             // Act
-            await _endOfDayUpdate.Update();
+            await _endOfDayUpdate.Update(_stocksContext);
 
             // Assert
             Assert.AreEqual(1, stocks.Count);

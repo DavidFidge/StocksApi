@@ -77,10 +77,10 @@ namespace StocksApi.Controllers
             return NoContent();
         }
 
-        [HttpPost]
+        [HttpPost("Update")]
         public async Task<ActionResult<Stock>> Update()
         {
-            await _companyInformation.Update();
+            await _companyInformation.Update(_context);
 
             return NoContent();
         }

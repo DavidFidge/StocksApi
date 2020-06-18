@@ -28,10 +28,7 @@ namespace StocksApi.Service.Tests
             _companyInformationStore = Substitute.For<ICompanyInformationStore>();
             _stocksContext = Substitute.For<StocksContext>();
             
-            _companyInformation = new CompanyInformation(
-                Logger,
-                _stocksContext,
-                _companyInformationStore);
+            _companyInformation = new CompanyInformation(Logger, _companyInformationStore);
         }
 
         [TestMethod]
@@ -54,7 +51,7 @@ namespace StocksApi.Service.Tests
                 .Returns(asxData);
 
             // Act
-            await _companyInformation.Update();
+            await _companyInformation.Update(_stocksContext);
 
             // Assert
             Assert.AreEqual(3, stocks.Count);
@@ -92,7 +89,7 @@ namespace StocksApi.Service.Tests
                 .Returns(asxData);
 
             // Act
-            await _companyInformation.Update();
+            await _companyInformation.Update(_stocksContext);
 
             // Assert
             Assert.AreEqual(1, stocks.Count);

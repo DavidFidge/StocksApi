@@ -7,12 +7,9 @@ namespace StocksApi.Service.Companies
 {
     public class FileCompanyInformationStore : BaseService<FileCompanyInformationStore>, ICompanyInformationStore
     {
-        private readonly ILogger<FileCompanyInformationStore> _logger;
-
         public FileCompanyInformationStore(ILogger<FileCompanyInformationStore> logger)
             : base(logger)
         {
-            _logger = logger;
         }
 
         public async Task<string> GetFromStore()

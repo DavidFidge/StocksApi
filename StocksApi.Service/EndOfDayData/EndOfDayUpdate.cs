@@ -13,54 +13,51 @@ namespace StocksApi.Service.EndOfDayData
 {
     public interface IEndOfDayUpdate
     {
-        Task Update();
+        Task Update(StocksContext stocksContext);
     }
 
     public class EndOfDayUpdate : BaseService<EndOfDayUpdate>, IEndOfDayUpdate
     {
-        private readonly StocksContext _stocksContext;
         private readonly IEndOfDayStore _endOfDayStore;
 
         public EndOfDayUpdate(
             ILogger<EndOfDayUpdate> logger,
-            StocksContext stocksContext,
             IEndOfDayStore endOfDayStore)
         : base(logger)
         {
-            _stocksContext = stocksContext;
             _endOfDayStore = endOfDayStore;
         }
 
-        public async Task Update()
+        public async Task Update(StocksContext stocksContext)
         {
-            var endOfDays = await GetEndOfDays();
+            var endOfDays = await GetEndOfDays(stocksContext);
 
-            DeleteExistingEndOfDaysForSameDates(endOfDays);
+            DeleteExistingEndOfDaysForSameDates(endOfDays, stocksContext);
 
-            _stocksContext.AddRange(endOfDays);
-            _stocksContext.SaveChanges();
+            stocksContext.AddRange(endOfDays);
+            stocksContext.SaveChanges();
         }
 
-        private void DeleteExistingEndOfDaysForSameDates(IList<EndOfDay> endOfDays)
+        private void DeleteExistingEndOfDaysForSameDates(IList<EndOfDay> endOfDays, StocksContext stocksContext)
         {
             var endOfDayDates = endOfDays
                 .Select(e => e.Date)
                 .Distinct()
                 .ToList();
 
-            var endOfDaysToDelete = _stocksContext.EndOfDay
+            var endOfDaysToDelete = stocksContext.EndOfDay
                 .Where(e => endOfDayDates.Contains(e.Date))
                 .ToList();
 
-            _stocksContext.RemoveRange(endOfDaysToDelete);
-            _stocksContext.SaveChanges();
+            stocksContext.RemoveRange(endOfDaysToDelete);
+            stocksContext.SaveChanges();
         }
 
-        private async Task<IList<EndOfDay>> GetEndOfDays()
+        private async Task<IList<EndOfDay>> GetEndOfDays(StocksContext stocksContext)
         {
             var endOfDays = new List<EndOfDay>();
 
-            var allStocks = _stocksContext
+            var allStocks = stocksContext
                 .Stock
                 .ToList();
 
@@ -94,7 +91,7 @@ namespace StocksApi.Service.EndOfDayData
                 .Except(allStocks, Stock.EqualityComparer)
                 .ToList();
 
-            _stocksContext.AddRange(newStocks);
+            stocksContext.AddRange(newStocks);
 
             return endOfDays;
         }

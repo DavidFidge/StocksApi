@@ -4,32 +4,28 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
-
 using StocksApi.Data;
 
 namespace StocksApi.Service.Companies
 {
     public interface ICompanyInformation
     {
-        Task Update();
+        Task Update(StocksContext stocksContext);
     }
 
     public class CompanyInformation : BaseService<CompanyInformation>, ICompanyInformation
     {
-        private readonly StocksContext _context;
         private readonly ICompanyInformationStore _companyInformationStore;
 
         public CompanyInformation(
             ILogger<CompanyInformation> logger,
-            StocksContext context,
             ICompanyInformationStore companyInformationStore)
         : base(logger)
         {
-            _context = context;
             _companyInformationStore = companyInformationStore;
         }
 
-        public async Task Update()
+        public async Task Update(StocksContext stocksContext)
         {
             var content = await _companyInformationStore.GetFromStore();
 
@@ -45,12 +41,12 @@ namespace StocksApi.Service.Companies
                     if (matches.Count != 3)
                         continue;
 
-                    var stock = _context.Stock.FirstOrDefault(s => s.Code == matches[1].Groups[2].Value);
+                    var stock = stocksContext.Stock.FirstOrDefault(s => s.Code == matches[1].Groups[2].Value);
 
                     if (stock == null)
                     {
                         stock = new Model.Stock();
-                        _context.Add(stock);
+                        stocksContext.Add(stock);
                     }
 
                     stock.CompanyName = matches[0].Groups[2].Value;
@@ -59,7 +55,7 @@ namespace StocksApi.Service.Companies
                 }
             }
 
-            _context.SaveChanges();
+            stocksContext.SaveChanges();
         }
     }
 }

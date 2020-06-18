@@ -12,10 +12,11 @@ namespace StocksApi
         public static void Main(string[] args)
         {
             var minLogLevel = GetLogEventLevel();
+            var entityFrameworkLogLevel = GetEntityFrameworkLogEventLevel();
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Is(minLogLevel)
-                //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", entityFrameworkLogLevel)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.Seq(Environment.GetEnvironmentVariable("STOCKAPI_SEQ_URL") ?? "http://localhost:5341")
@@ -44,6 +45,20 @@ namespace StocksApi
             if (String.IsNullOrEmpty(logLevel))
                 return defaultLevel;
             
+            if (!Enum.TryParse(logLevel, out LogEventLevel level))
+                level = defaultLevel;
+
+            return level;
+        }
+
+        private static LogEventLevel GetEntityFrameworkLogEventLevel()
+        {
+            var defaultLevel = LogEventLevel.Warning;
+            var logLevel = Environment.GetEnvironmentVariable("STOCKAPI_ENTITYFRAMEWORK_LOG_LEVEL");
+
+            if (String.IsNullOrEmpty(logLevel))
+                return defaultLevel;
+
             if (!Enum.TryParse(logLevel, out LogEventLevel level))
                 level = defaultLevel;
 

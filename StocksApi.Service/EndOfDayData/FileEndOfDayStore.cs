@@ -18,9 +18,11 @@ namespace StocksApi.Service.EndOfDayData
         {
             var files = Directory.EnumerateFiles("C:\\dev\\StocksApi\\StocksApi\\csv", "*.txt");
 
-            var endOfDays = await Task.WhenAll(files.Select(async f => await File.ReadAllTextAsync(f)));
+            var endOfDays = await Task.WhenAll(files.Select(async f => await File.ReadAllLinesAsync(f)));
 
-            return endOfDays;
+            return endOfDays
+                .SelectMany(s => s)
+                .ToList();
         }
     }
 }

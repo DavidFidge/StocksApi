@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StocksApi.Data;
 using StocksApi.Model;
+using StocksApi.Service.EndOfDayData;
 
 namespace StocksApi.Controllers
 {
@@ -14,10 +15,12 @@ namespace StocksApi.Controllers
     public class EndOfDayController : ControllerBase
     {
         private readonly StocksContext _context;
+        private readonly IEndOfDayUpdate _endOfDayUpdate;
 
-        public EndOfDayController(StocksContext context)
+        public EndOfDayController(StocksContext context, IEndOfDayUpdate endOfDayUpdate)
         {
             _context = context;
+            _endOfDayUpdate = endOfDayUpdate;
         }
 
         // GET: api/EndOfDayController
@@ -99,6 +102,14 @@ namespace StocksApi.Controllers
             await _context.SaveChangesAsync();
 
             return endOfDay;
+        }
+
+        [HttpPost("Update")]
+        public async Task<ActionResult<Stock>> Update()
+        {
+            await _endOfDayUpdate.Update(_context);
+
+            return NoContent();
         }
 
         private bool EndOfDayExists(Guid id)
