@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
+using StocksApi.Core;
+
 namespace StocksApi.Service.Companies
 {
     public class AsxCompanyInformationStore : BaseService<AsxCompanyInformationStore>, ICompanyInformationStore
@@ -15,7 +17,7 @@ namespace StocksApi.Service.Companies
         public AsxCompanyInformationStore(ILogger<AsxCompanyInformationStore> logger)
             : base(logger)
         {
-            _uri = new Uri(Environment.GetEnvironmentVariable("STOCKAPI_ASX_LISTED_COMPANIES_URL") ?? "https://www.asx.com.au/asx/research/ASXListedCompanies.csv");
+            _uri = new Uri(Environment.GetEnvironmentVariable(Constants.StocksApiAsxListedCompaniesUrl) ?? "https://www.asx.com.au/asx/research/ASXListedCompanies.csv");
         }
 
         public async Task<string> GetFromStore()

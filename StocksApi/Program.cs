@@ -5,6 +5,8 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 
+using StocksApi.Core;
+
 namespace StocksApi
 {
     public class Program
@@ -19,7 +21,7 @@ namespace StocksApi
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", entityFrameworkLogLevel)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.Seq(Environment.GetEnvironmentVariable("STOCKAPI_SEQ_URL") ?? "http://localhost:5341")
+                .WriteTo.Seq(Environment.GetEnvironmentVariable(Constants.StocksApiSeqUrl) ?? "http://localhost:5341")
                 .CreateLogger();
 
             try
@@ -40,7 +42,7 @@ namespace StocksApi
         private static LogEventLevel GetLogEventLevel()
         {
             var defaultLevel = LogEventLevel.Information;
-            var logLevel = Environment.GetEnvironmentVariable("STOCKAPI_LOG_LEVEL");
+            var logLevel = Environment.GetEnvironmentVariable(Constants.StocksApiLogLevel);
 
             if (String.IsNullOrEmpty(logLevel))
                 return defaultLevel;
@@ -54,7 +56,7 @@ namespace StocksApi
         private static LogEventLevel GetEntityFrameworkLogEventLevel()
         {
             var defaultLevel = LogEventLevel.Warning;
-            var logLevel = Environment.GetEnvironmentVariable("STOCKAPI_ENTITYFRAMEWORK_LOG_LEVEL");
+            var logLevel = Environment.GetEnvironmentVariable(Constants.StocksApiEntityFrameworkLogLevel);
 
             if (String.IsNullOrEmpty(logLevel))
                 return defaultLevel;

@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.AspNet.OData.Extensions;
-using Microsoft.AspNet.OData.Formatter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -15,6 +15,7 @@ using Microsoft.OpenApi.Models;
 
 using Serilog;
 
+using StocksApi.Core;
 using StocksApi.Data;
 using StocksApi.Service.Companies;
 using StocksApi.Service.EndOfDayData;
@@ -70,10 +71,13 @@ namespace StocksApi
                 }
             });
 
+            var connectionString = Environment.GetEnvironmentVariable(Constants.StocksApiSeqUrl)
+                ?? Configuration.GetConnectionString("STOCKSAPI_STOCKSDBCONNECTIONSTRING");
+
             services
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<StocksContext>( o =>
-                    o.UseSqlite(Configuration.GetConnectionString("StocksDb"))
+                    o.UseSqlite(connectionString)
                         .EnableSensitiveDataLogging()
                     );
         }

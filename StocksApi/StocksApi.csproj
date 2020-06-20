@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StocksApi.Core\StocksApi.Core.csproj" />
     <ProjectReference Include="..\StocksApi.Data\StocksApi.Data.csproj" />
     <ProjectReference Include="..\StocksApi.Model\StocksApi.Model.csproj" />
     <ProjectReference Include="..\StocksApi.Service\StocksApi.Service.csproj" />
