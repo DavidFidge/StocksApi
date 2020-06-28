@@ -8,6 +8,9 @@ namespace StocksApi.Data
     {
         public virtual DbSet<EndOfDay> EndOfDay { get; set; }
         public virtual DbSet<Stock> Stock { get; set; }
+        public virtual DbSet<PortfolioManager> PortfolioManagers { get; set; }
+        public virtual DbSet<Portfolio> Portfolios { get; set; }
+        public virtual DbSet<Holding> Holdings { get; set; }
 
         public StocksContext()
         {
