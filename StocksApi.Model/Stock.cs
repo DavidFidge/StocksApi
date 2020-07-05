@@ -10,6 +10,15 @@ namespace StocksApi.Model
         public string IndustryGroup { get; set; }
 
         public static IEqualityComparer<Stock> EqualityComparer => new StockEqualityComparer();
+
+        public static Stock CreateDefault(string code)
+        {
+            return new Stock
+            {
+                CompanyName = code,
+                Code = code
+            };
+        }
     }
 
     public class StockEqualityComparer : IEqualityComparer<Stock>

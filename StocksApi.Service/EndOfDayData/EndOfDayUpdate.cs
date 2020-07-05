@@ -103,11 +103,7 @@ namespace StocksApi.Service.EndOfDayData
             if (stock != null)
                 return stock;
 
-            stock = new Stock
-            {
-                Code = stockCode,
-                CompanyName = stockCode
-            };
+            stock = Stock.CreateDefault(stockCode);
 
             allStocks.Add(stock);
 

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using AutoMapper;
+
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
@@ -14,111 +17,82 @@ namespace StocksApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EndOfDayController : ControllerBase
+    public class EndOfDayController : BaseController<StocksContext, SaveEndOfDayDto, EndOfDay>
     {
-        private readonly StocksContext _context;
         private readonly IEndOfDayUpdate _endOfDayUpdate;
 
-        public EndOfDayController(StocksContext context, IEndOfDayUpdate endOfDayUpdate)
+        public EndOfDayController(StocksContext dbContext, IEndOfDayUpdate endOfDayUpdate, IMapper mapper)
+            : base(dbContext, mapper)
+
         {
-            _context = context;
             _endOfDayUpdate = endOfDayUpdate;
         }
 
-        // GET: api/EndOfDayController
         [HttpGet]
         [EnableQuery(PageSize = 3655)]
         [ODataRoute]
-        public IQueryable<EndOfDay> GetEndOfDay()
+        public IQueryable<EndOfDay> GetEndOfDays()
         {
-            return _context.EndOfDay.Include(e => e.Stock);
+            return _dbContext.EndOfDay.Include(e => e.Stock);
         }
 
-        // GET: api/EndOfDayController/5
         [HttpGet("{id}")]
         public async Task<ActionResult<EndOfDay>> GetEndOfDay(Guid id)
         {
-            var endOfDay = await _context.EndOfDay.FindAsync(id);
-
-            if (endOfDay == null)
-            {
-                return NotFound();
-            }
-
-            return endOfDay;
+            return await GetById(_dbContext.EndOfDay, id);
         }
 
-        // PUT: api/EndOfDayController/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEndOfDay(Guid id, EndOfDay endOfDay)
+        public async Task<IActionResult> PutEndOfDay(Guid id, SaveEndOfDayDto saveEndOfDayDto)
         {
-            if (id != endOfDay.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(endOfDay).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EndOfDayExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return await PutById(id, _dbContext.EndOfDay, saveEndOfDayDto);
         }
 
-        // POST: api/EndOfDayController
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<EndOfDay>> PostEndOfDay(EndOfDay endOfDay)
+        public async Task<ActionResult<EndOfDay>> PostEndOfDay(SaveEndOfDayDto saveEndOfDayDto)
         {
-            _context.EndOfDay.Add(endOfDay);
-            await _context.SaveChangesAsync();
+            var result = await PostById(_dbContext.EndOfDay, saveEndOfDayDto, nameof(GetEndOfDay));
 
-            return CreatedAtAction("GetEndOfDay", new { id = endOfDay.Id }, endOfDay);
+            Stock stock;
+
+            if (saveEndOfDayDto.StockCode != null)
+            {
+                stock = await _dbContext.Stock.SingleOrDefaultAsync(s => s.Code == saveEndOfDayDto.StockCode);
+
+                if (stock == null)
+                {
+                    stock = Stock.CreateDefault(saveEndOfDayDto.StockCode);
+
+                    _dbContext.Stock.Add(stock);
+                }
+            }
+            else
+            {
+                stock = await _dbContext.Stock.FindAsync(saveEndOfDayDto.StockId);
+            }
+
+            if (stock == null)
+                return NotFound();
+
+            result.Value.Stock = stock;
+
+            await _dbContext.SaveChangesAsync();
+
+            return result;
         }
 
-        // DELETE: api/EndOfDayController/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<EndOfDay>> DeleteEndOfDay(Guid id)
         {
-            var endOfDay = await _context.EndOfDay.FindAsync(id);
-            if (endOfDay == null)
-            {
-                return NotFound();
-            }
-
-            _context.EndOfDay.Remove(endOfDay);
-            await _context.SaveChangesAsync();
-
-            return endOfDay;
+            return await DeleteById(_dbContext.EndOfDay, id);
         }
 
         [HttpPost("Update")]
         public async Task<ActionResult<Stock>> Update()
         {
-            await _endOfDayUpdate.Update(_context);
+            await _endOfDayUpdate.Update(_dbContext);
 
             return NoContent();
-        }
-
-        private bool EndOfDayExists(Guid id)
-        {
-            return _context.EndOfDay.Any(e => e.Id == id);
         }
     }
 }

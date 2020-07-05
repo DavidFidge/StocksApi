@@ -14,4 +14,8 @@
     <ProjectReference Include="..\StocksApi.Model\StocksApi.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Portfolios\" />
+  </ItemGroup>
+
 </Project>
