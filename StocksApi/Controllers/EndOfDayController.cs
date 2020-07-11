@@ -68,7 +68,7 @@ namespace StocksApi.Controllers
             }
             else
             {
-                stock = await _dbContext.Stock.FindAsync(saveEndOfDayDto.StockId);
+                stock = await _dbContext.Stock.SingleOrDefaultAsync(e => e.Id == saveEndOfDayDto.StockId);
             }
 
             if (stock == null)

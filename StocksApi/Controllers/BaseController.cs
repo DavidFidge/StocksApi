@@ -34,9 +34,9 @@ namespace StocksApi.Controllers
             if (id == Guid.Empty || id != saveDto.Id)
                 return BadRequest();
 
-            var holding = await dbSet.FindAsync(id);
+            var entity = await dbSet.SingleOrDefaultAsync(e => e.Id == id);
 
-            if (holding == null)
+            if (entity == null)
                 return NotFound();
 
             await dbSet.Persist(_mapper).InsertOrUpdateAsync(saveDto);
@@ -59,7 +59,7 @@ namespace StocksApi.Controllers
 
         protected async Task<ActionResult<TEntity>> DeleteById(DbSet<TEntity> dbSet, Guid id)
         {
-            var entity = await dbSet.FindAsync(id);
+            var entity = await dbSet.SingleOrDefaultAsync(e => e.Id == id);
 
             if (entity == null)
                 return NotFound();
@@ -73,7 +73,7 @@ namespace StocksApi.Controllers
 
         protected async Task<ActionResult<TEntity>> GetById(DbSet<TEntity> dbSet, Guid id)
         {
-            var entity = await dbSet.FindAsync(id);
+            var entity = await dbSet.SingleOrDefaultAsync(e => e.Id == id);
 
             if (entity == null)
                 return NotFound();

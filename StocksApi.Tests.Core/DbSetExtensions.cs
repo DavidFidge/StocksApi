@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 using NSubstitute;
 
+using StocksApi.Tests.Core;
+
 namespace StocksApi.Service.Tests
 {
     public static class DbSetExtensions
@@ -13,10 +15,17 @@ namespace StocksApi.Service.Tests
         {
             var dataQueryable = data.AsQueryable();
 
-            ((IQueryable<T>)dbSet).Provider.Returns(dataQueryable.Provider);
-            ((IQueryable<T>)dbSet).Expression.Returns(dataQueryable.Expression);
-            ((IQueryable<T>)dbSet).ElementType.Returns(dataQueryable.ElementType);
-            ((IQueryable<T>)dbSet).GetEnumerator().Returns(data.GetEnumerator());
+            ((IQueryable<T>)dbSet).Expression
+                .Returns(dataQueryable.Expression);
+
+            ((IQueryable<T>)dbSet).ElementType
+                .Returns(dataQueryable.ElementType);
+
+            ((IQueryable<T>)dbSet).GetEnumerator()
+                .Returns(data.GetEnumerator());
+
+            ((IQueryable<T>)dbSet).Provider
+                .Returns(new TestAsyncQueryProvider<T>(dataQueryable.Provider));
 
             return dbSet;
         }

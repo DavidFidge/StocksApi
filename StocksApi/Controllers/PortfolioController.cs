@@ -64,7 +64,7 @@ namespace StocksApi.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Portfolio>> DeletePortfolio(Guid id)
         {
-            var portfolio = await _dbContext.Portfolios.FindAsync(id);
+            var portfolio = await _dbContext.Portfolios.SingleOrDefaultAsync(e => e.Id == id);
 
             _dbContext.Holdings.RemoveRange(portfolio.Holdings);
 
