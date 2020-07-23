@@ -82,13 +82,13 @@ namespace StocksApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<EndOfDay>> DeleteEndOfDay(Guid id)
+        public async Task<IActionResult> DeleteEndOfDay(Guid id)
         {
             return await DeleteById(_dbContext.EndOfDay, id);
         }
 
         [HttpPost("Update")]
-        public async Task<ActionResult<Stock>> Update()
+        public async Task<IActionResult> Update()
         {
             await _endOfDayUpdate.Update(_dbContext);
 

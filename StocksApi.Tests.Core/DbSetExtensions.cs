@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -5,13 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 using NSubstitute;
 
+using StocksApi.Model;
 using StocksApi.Tests.Core;
 
 namespace StocksApi.Service.Tests
 {
     public static class DbSetExtensions
     {
-        public static DbSet<T> Initialize<T>(this DbSet<T> dbSet, IList<T> data) where T : class
+        public static DbSet<T> Initialize<T>(this DbSet<T> dbSet, IList<T> data) where T : Entity
         {
             var dataQueryable = data.AsQueryable();
 
@@ -30,22 +32,27 @@ namespace StocksApi.Service.Tests
             return dbSet;
         }
 
-        public static DbSet<T> WithAddRemove<T>(this DbSet<T> dbSet, IList<T> data, DbContext context) where T : class
+        public static DbSet<T> WithAddRemove<T>(this DbSet<T> dbSet, IList<T> data) where T : Entity
         {
             dbSet
-                .WithAdd(data, context)
-                .WithRemove(data, context);
+                .WithAdd(data)
+                .WithRemove(data);
 
             return dbSet;
         }
 
-        public static DbSet<T> WithAdd<T>(this DbSet<T> dbSet, IList<T> data, DbContext context) where T : class
+        public static DbSet<T> WithAdd<T>(this DbSet<T> dbSet, IList<T> data) where T : Entity
         {
-            context
+            dbSet
                 .When(c => c.Add(Arg.Any<T>()))
-                .Do(ci => data.Add(ci.Arg<T>()));
+                .Do(ci =>
+                {
+                    var entity = ci.Arg<T>();
+                    entity.Id = Guid.NewGuid();
+                    data.Add(entity);
+                });
 
-            context
+            dbSet
                 .When(c => c.AddRange(Arg.Any<IEnumerable<T>>()))
                 .Do(
                     ci =>
@@ -53,6 +60,8 @@ namespace StocksApi.Service.Tests
                         var list = ci.Arg<IEnumerable<T>>();
                         foreach (var item in list)
                         {
+                            var entity = ci.Arg<T>();
+                            entity.Id = Guid.NewGuid();
                             data.Add(item);
                         }
                     }
@@ -61,13 +70,13 @@ namespace StocksApi.Service.Tests
             return dbSet;
         }
 
-        public static DbSet<T> WithRemove<T>(this DbSet<T> dbSet, IList<T> data, DbContext context) where T : class
+        public static DbSet<T> WithRemove<T>(this DbSet<T> dbSet, IList<T> data) where T : Entity
         {
-            context
+            dbSet
                 .When(c => c.Remove(Arg.Any<T>()))
                 .Do(ci => data.Remove(ci.Arg<T>()));
 
-            context
+            dbSet
                 .When(c => c.RemoveRange(Arg.Any<IEnumerable<T>>()))
                 .Do(
                     ci =>

@@ -53,7 +53,7 @@ namespace StocksApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Holding>> DeleteHolding(Guid id)
+        public async Task<IActionResult> DeleteHolding(Guid id)
         {
             return await DeleteById(_dbContext.Holdings, id);
         }

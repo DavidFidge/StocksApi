@@ -62,7 +62,7 @@ namespace StocksApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Portfolio>> DeletePortfolio(Guid id)
+        public async Task<IActionResult> DeletePortfolio(Guid id)
         {
             var portfolio = await _dbContext.Portfolios.SingleOrDefaultAsync(e => e.Id == id);
 

@@ -46,7 +46,7 @@ namespace StocksApi.Service.Tests
 
             var dbSetStocks = Substitute.For<DbSet<Stock>, IQueryable<Stock>>()
                 .Initialize(stocks)
-                .WithAddRemove(stocks, _stocksContext);
+                .WithAddRemove(stocks);
 
             _stocksContext.Stock = dbSetStocks;
 
@@ -54,7 +54,7 @@ namespace StocksApi.Service.Tests
 
             var dbSetEndOfDays = Substitute.For<DbSet<EndOfDay>, IQueryable<EndOfDay>>()
                 .Initialize(endOfDayEntities)
-                .WithAddRemove(endOfDayEntities, _stocksContext);
+                .WithAddRemove(endOfDayEntities);
 
             _stocksContext.EndOfDay = dbSetEndOfDays;
 
@@ -85,7 +85,7 @@ namespace StocksApi.Service.Tests
 
             var dbSetStocks = Substitute.For<DbSet<Stock>, IQueryable<Stock>>()
                 .Initialize(stocks)
-                .WithAddRemove(stocks, _stocksContext);
+                .WithAddRemove(stocks);
 
             _stocksContext.Stock = dbSetStocks;
 
@@ -93,7 +93,7 @@ namespace StocksApi.Service.Tests
 
             var dbSetEndOfDays = Substitute.For<DbSet<EndOfDay>, IQueryable<EndOfDay>>()
                 .Initialize(endOfDayEntities)
-                .WithAddRemove(endOfDayEntities, _stocksContext);
+                .WithAddRemove(endOfDayEntities);
 
             _stocksContext.EndOfDay = dbSetEndOfDays;
 
@@ -137,7 +137,7 @@ namespace StocksApi.Service.Tests
 
             var dbSetStocks = Substitute.For<DbSet<Stock>, IQueryable<Stock>>()
                 .Initialize(stocks)
-                .WithAddRemove(stocks, _stocksContext);
+                .WithAddRemove(stocks);
 
             _stocksContext.Stock = dbSetStocks;
 
@@ -145,7 +145,7 @@ namespace StocksApi.Service.Tests
 
             var dbSetEndOfDays = Substitute.For<DbSet<EndOfDay>, IQueryable<EndOfDay>>()
                 .Initialize(endOfDayEntities)
-                .WithAddRemove(endOfDayEntities, _stocksContext);
+                .WithAddRemove(endOfDayEntities);
 
             _stocksContext.EndOfDay = dbSetEndOfDays;
 
@@ -187,7 +187,7 @@ namespace StocksApi.Service.Tests
 
             var dbSetStocks = Substitute.For<DbSet<Stock>, IQueryable<Stock>>()
                 .Initialize(stocks)
-                .WithAddRemove(stocks, _stocksContext);
+                .WithAddRemove(stocks);
 
             _stocksContext.Stock = dbSetStocks;
 
@@ -219,7 +219,7 @@ namespace StocksApi.Service.Tests
 
             var dbSetEndOfDays = Substitute.For<DbSet<EndOfDay>, IQueryable<EndOfDay>>()
                 .Initialize(endOfDayEntities)
-                .WithAddRemove(endOfDayEntities, _stocksContext);
+                .WithAddRemove(endOfDayEntities);
 
             _stocksContext.EndOfDay = dbSetEndOfDays;
 

@@ -57,7 +57,7 @@ namespace StocksApi.Controllers
             return CreatedAtAction(getActionName, new { id = entity.Id }, entity);
         }
 
-        protected async Task<ActionResult<TEntity>> DeleteById(DbSet<TEntity> dbSet, Guid id)
+        protected async Task<IActionResult> DeleteById(DbSet<TEntity> dbSet, Guid id)
         {
             var entity = await dbSet.SingleOrDefaultAsync(e => e.Id == id);
 
@@ -68,7 +68,7 @@ namespace StocksApi.Controllers
             
             await _dbContext.SaveChangesAsync();
 
-            return entity;
+            return NoContent();
         }
 
         protected async Task<ActionResult<TEntity>> GetById(DbSet<TEntity> dbSet, Guid id)

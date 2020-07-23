@@ -39,7 +39,7 @@ namespace StocksApi.Service.Tests
 
             var dbSet = Substitute.For<DbSet<Stock>, IQueryable<Stock>>()
                 .Initialize(stocks)
-                .WithAddRemove(stocks, _stocksContext);
+                .WithAddRemove(stocks);
 
             _stocksContext.Stock = dbSet;
 
@@ -77,7 +77,7 @@ namespace StocksApi.Service.Tests
 
             var dbSet = Substitute.For<DbSet<Stock>, IQueryable<Stock>>()
                 .Initialize(stocks)
-                .WithAddRemove(stocks, _stocksContext);
+                .WithAddRemove(stocks);
 
             _stocksContext.Stock = dbSet;
 

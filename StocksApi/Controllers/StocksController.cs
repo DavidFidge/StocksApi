@@ -48,7 +48,7 @@ namespace StocksApi.Controllers
         }
 
         [HttpPost("Update")]
-        public async Task<ActionResult<Stock>> UpdateFromThirdParty()
+        public async Task<IActionResult> UpdateFromThirdParty()
         {
             await _companyInformation.Update(_dbContext);
 
@@ -62,7 +62,7 @@ namespace StocksApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Stock>> DeleteStock(Guid id)
+        public async Task<IActionResult> DeleteStock(Guid id)
         {
             return await DeleteById(_dbContext.Stock, id);
         }

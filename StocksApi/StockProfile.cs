@@ -10,6 +10,7 @@ namespace StocksApi
         public StockProfile()
         {
             CreateMap<SaveHoldingDto, Holding>();
+            CreateMap<SavePortfolioDto, Portfolio>();
         }
     }
 }
