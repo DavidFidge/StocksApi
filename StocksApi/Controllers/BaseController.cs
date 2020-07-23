@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using AutoMapper;
-using AutoMapper.EntityFrameworkCore;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +38,7 @@ namespace StocksApi.Controllers
             if (entity == null)
                 return NotFound();
 
-            await dbSet.Persist(_mapper).InsertOrUpdateAsync(saveDto);
+            _mapper.Map(saveDto, entity);
 
             await _dbContext.SaveChangesAsync();
 
@@ -48,9 +47,9 @@ namespace StocksApi.Controllers
 
         protected async Task<ActionResult<TEntity>> PostById(DbSet<TEntity> dbSet, TSaveDto saveDto, string getActionName)
         {
-            var entity = await dbSet
-                .Persist(_mapper)
-                .InsertOrUpdateAsync(saveDto);
+            var entity = _mapper.Map<TSaveDto, TEntity>(saveDto);
+
+            _dbContext.Add(entity);
 
             await _dbContext.SaveChangesAsync();
 

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 
 using AutoMapper;
-using AutoMapper.EquivalencyExpression;
 
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Builder;
@@ -85,11 +84,7 @@ namespace StocksApi
                         .EnableSensitiveDataLogging()
                     );
 
-            services.AddAutoMapper((serviceProvider, autoMapper) =>
-            {
-                autoMapper.AddCollectionMappers();
-                autoMapper.UseEntityFrameworkCoreModel<StocksContext>(serviceProvider);
-            }, Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

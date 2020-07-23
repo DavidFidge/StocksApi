@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using AutoMapper;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -36,22 +35,19 @@ namespace StocksApi.Tests
         {
             base.Setup();
 
-            var mapper = new Mapper(new MapperConfiguration(automapper =>
+            var mapper = new Mapper(new MapperConfiguration(autoMapper =>
             {
-                automapper.AddProfile(typeof(TestProfile));
-                automapper.UseEntityFrameworkCoreModel<TestDbContext>();
+                autoMapper.AddProfile(typeof(TestProfile));
             }));
-
-            using (var setupDbContext = new TestDbContext(ContextOptions))
-            {
-                setupDbContext.Database.EnsureDeleted();
-                setupDbContext.Database.EnsureCreated();
-            }
 
             _testDbContext = new TestDbContext(ContextOptions);
             _testBaseController = new TestBaseController(_testDbContext, mapper);
-        }
 
+            using var setupDbContext = new TestDbContext(ContextOptions);
+
+            setupDbContext.Database.EnsureDeleted();
+            setupDbContext.Database.EnsureCreated();
+        }
 
         [TestMethod]
         public async Task GetById_Should_Return_Entity()
@@ -59,24 +55,20 @@ namespace StocksApi.Tests
             // Arrange
             var testEntityId = Guid.NewGuid();
 
-            using (var seedTestDbContext = new TestDbContext(ContextOptions))
+            var testEntity = new TestEntity
             {
-                var testEntity = new TestEntity
-                {
-                    Id = testEntityId
-                };
+                Id = testEntityId
+            };
 
-                seedTestDbContext.TestEntities.Add(testEntity);
-                seedTestDbContext.SaveChanges();
-            }
+            SeedDatabase(testEntity);
 
             // Act
             var result = await _testBaseController.GetByIdTest(testEntityId);
 
             // Assert
-
             using var testDbContext = new TestDbContext(ContextOptions);
-            Assert.AreEqual(1, testEntities.Count);
+
+            Assert.AreEqual(1, testDbContext.TestEntities.Count());
             Assert.AreEqual(testEntity, result.Value);
         }
 
@@ -84,78 +76,81 @@ namespace StocksApi.Tests
         public async Task DeleteByIdTest_Should_Delete_Entity()
         {
             // Arrange
-            var testEntities = new List<TestEntity>();
-
-            var testEntity = new TestEntity
+            var testEntity1 = new TestEntity
             {
                 Id = Guid.NewGuid()
             };
 
-            testEntities.Add(testEntity);
+            var testEntity2 = new TestEntity
+            {
+                Id = Guid.NewGuid()
+            };
 
-            var dbSet = Substitute.For<DbSet<TestEntity>, IQueryable<TestEntity>>()
-                .Initialize(testEntities)
-                .WithRemove(testEntities);
+            SeedDatabase(new List<TestEntity> { testEntity1, testEntity2 });
 
-            _testDbContext.TestEntities = dbSet;
+            using (var testDbContextBeforeDelete = new TestDbContext(ContextOptions))
+            {
+                Assert.AreEqual(2, testDbContextBeforeDelete.TestEntities.Count());
+            }
 
             // Act
-            var result = await _testBaseController.DeleteByIdTest(testEntity.Id);
+            var result = await _testBaseController.DeleteByIdTest(testEntity1.Id);
 
             // Assert
             var noContentResult = result as NoContentResult;
-
             Assert.IsNotNull(noContentResult);
-            Assert.AreEqual(0, testEntities.Count);
+
+            using var testDbContext = new TestDbContext(ContextOptions);
+            Assert.AreEqual(1, testDbContext.TestEntities.Count());
+
+            var remainingEntity = testDbContext.TestEntities.First();
+            Assert.AreEqual(testEntity2.Id, remainingEntity.Id);
         }
 
         [TestMethod]
         public async Task PutById_Should_Update_Entity()
         {
             // Arrange
-            var testEntities = new List<TestEntity>();
-
-            var testEntity = new TestEntity
+            var testEntity1 = new TestEntity
             {
                 Id = Guid.NewGuid()
             };
 
-            testEntities.Add(testEntity);
+            var testEntity2 = new TestEntity
+            {
+                Id = Guid.NewGuid()
+            };
 
-            var dbSet = Substitute.For<DbSet<TestEntity>, IQueryable<TestEntity>>()
-                .Initialize(testEntities);
-
-            _testDbContext.TestEntities = dbSet;
+            SeedDatabase(new List<TestEntity> { testEntity1, testEntity2 });
 
             var testSaveDto = new TestSaveDto
             {
-                Id = testEntity.Id,
+                Id = testEntity2.Id,
                 TestProperty = "Updated"
             };
 
             // Act
-            var result = await _testBaseController.PutByIdTest(testEntity.Id, testSaveDto);
+            var result = await _testBaseController.PutByIdTest(testEntity2.Id, testSaveDto);
 
             // Assert
             var noContentResult = result as NoContentResult;
 
             Assert.IsNotNull(noContentResult);
-            Assert.AreEqual(1, testEntities.Count);
-            Assert.AreEqual("Updated", testEntity.TestProperty);
+
+            using var testDbContext = new TestDbContext(ContextOptions);
+            Assert.AreEqual(2, testDbContext.TestEntities.Count());
+
+            var updatedEntity = testDbContext.TestEntities.Single(t => t.Id == testEntity2.Id);
+            var unchangedEntity = testDbContext.TestEntities.Single(t => t.Id == testEntity1.Id);
+
+            Assert.AreEqual(testSaveDto.TestProperty, updatedEntity.TestProperty);
+            Assert.IsNull(unchangedEntity.TestProperty);
         }
 
         [TestMethod]
         public async Task PostById_Should_Create_Entity()
         {
             // Arrange
-            var testEntities = new List<TestEntity>();
-
-            var dbSet = Substitute.For<DbSet<TestEntity>, IQueryable<TestEntity>>()
-                .Initialize(testEntities)
-                .WithAdd(testEntities);
-
-            _testDbContext.TestEntities = dbSet;
-
             var testSaveDto = new TestSaveDto
             {
                 TestProperty = "New"
@@ -173,9 +168,28 @@ namespace StocksApi.Tests
             var id = (Guid)createdAtActionResult.RouteValues["id"];
 
             Assert.AreEqual(id, createdAtActionResult.RouteValues["id"]);
-            Assert.AreEqual(1, testEntities.Count);
-            Assert.AreEqual("New", result.Value.TestProperty);
-            Assert.AreEqual(id, result.Value.Id);
+
+            using var testDbContext = new TestDbContext(ContextOptions);
+
+            Assert.AreEqual(1, testDbContext.TestEntities.Count());
+            
+            var entity = testDbContext.TestEntities.First();
+
+            Assert.AreEqual(id, entity.Id);
+            Assert.AreEqual("New", entity.TestProperty);
+        }
+
+        private void SeedDatabase(List<TestEntity> testEntities)
+        {
+            using var seedTestDbContext = new TestDbContext(ContextOptions);
+
+            seedTestDbContext.TestEntities.AddRange(testEntities);
+            seedTestDbContext.SaveChanges();
+        }
+
+        private void SeedDatabase(TestEntity testEntity)
+        {
+            SeedDatabase(new List<TestEntity> { testEntity });
         }
 
         public class TestBaseController : BaseController<TestDbContext, TestSaveDto, TestEntity>
@@ -220,7 +234,6 @@ namespace StocksApi.Tests
         {
             public virtual DbSet<TestEntity> TestEntities { get; set; }
 
-            
             public TestDbContext()
             {
             }
