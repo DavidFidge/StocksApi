@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace StocksApi.Service.Tests
 {
     public abstract class BaseSqlLiteTest<T, TContext> : BaseTest<T>, IDisposable
-    where TContext : DbContext
+    where TContext : DbContext, new()
     {
         protected DbConnection Connection;
         protected DbContextOptions<TContext> ContextOptions { get; set; }
@@ -20,6 +20,12 @@ namespace StocksApi.Service.Tests
             ContextOptions = new DbContextOptionsBuilder<TContext>()
                 .UseSqlite(Connection)
                 .Options;
+        }
+
+        protected void SetupDatabase(TContext setupDbContext)
+        {
+            setupDbContext.Database.EnsureDeleted();
+            setupDbContext.Database.EnsureCreated();
         }
 
         private DbConnection CreateInMemoryDatabase()

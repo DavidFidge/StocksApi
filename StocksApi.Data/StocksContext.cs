@@ -23,6 +23,9 @@ namespace StocksApi.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            if (optionsBuilder.IsConfigured)
+                return;
+
             optionsBuilder.UseSqlite("Filename=Stocks.db");
         }
     }

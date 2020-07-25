@@ -44,9 +44,7 @@ namespace StocksApi.Tests
             _testBaseController = new TestBaseController(_testDbContext, mapper);
 
             using var setupDbContext = new TestDbContext(ContextOptions);
-
-            setupDbContext.Database.EnsureDeleted();
-            setupDbContext.Database.EnsureCreated();
+            SetupDatabase(setupDbContext);
         }
 
         [TestMethod]
