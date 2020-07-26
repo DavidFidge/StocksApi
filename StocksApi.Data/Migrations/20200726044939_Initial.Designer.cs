@@ -9,8 +9,8 @@ using StocksApi.Data;
 namespace StocksApi.Data.Migrations
 {
     [DbContext(typeof(StocksContext))]
-    [Migration("20200628011659_init")]
-    partial class init
+    [Migration("20200726044939_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -82,7 +82,7 @@ namespace StocksApi.Data.Migrations
 
                     b.HasIndex("StockId");
 
-                    b.ToTable("Holdings");
+                    b.ToTable("Holding");
                 });
 
             modelBuilder.Entity("StocksApi.Model.Portfolio", b =>
@@ -101,7 +101,7 @@ namespace StocksApi.Data.Migrations
 
                     b.HasIndex("PortfolioManagerId");
 
-                    b.ToTable("Portfolios");
+                    b.ToTable("Portfolio");
                 });
 
             modelBuilder.Entity("StocksApi.Model.PortfolioManager", b =>
@@ -115,7 +115,7 @@ namespace StocksApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PortfolioManagers");
+                    b.ToTable("PortfolioManager");
                 });
 
             modelBuilder.Entity("StocksApi.Model.Stock", b =>

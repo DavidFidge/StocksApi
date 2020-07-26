@@ -6,5 +6,6 @@
         public static string StocksApiLogLevel = "STOCKSAPI_LOG_LEVEL";
         public static string StocksApiEntityFrameworkLogLevel = "STOCKSAPI_ENTITYFRAMEWORK_LOG_LEVEL";
         public static string StocksApiAsxListedCompaniesUrl = "STOCKSAPI_ASX_LISTED_COMPANIES_URL";
+        public static string StocksApiStocksDbConnectionString = "STOCKSAPI_STOCKSDBCONNECTIONSTRING";
     }
 }

@@ -24,25 +24,25 @@ namespace StocksApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Holding>> GetHolding(Guid id)
         {
-            return await GetById(_dbContext.Holdings, id);
+            return await GetById(_dbContext.Holding, id);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutHolding(Guid id, SaveHoldingDto saveHoldingDto)
         {
-            return await PutById(id, _dbContext.Holdings, saveHoldingDto);
+            return await PutById(id, _dbContext.Holding, saveHoldingDto);
         }
 
         [HttpPost]
         public async Task<ActionResult<Holding>> PostHolding(SaveHoldingDto saveHoldingDto)
         {
-            var portfolio = _dbContext.Portfolios
+            var portfolio = _dbContext.Portfolio
                 .SingleOrDefault(p => p.Id == saveHoldingDto.PortfolioId);
 
             if (portfolio == null)
                 return NotFound();
 
-            var result = await PostById(_dbContext.Holdings, saveHoldingDto, nameof(GetHolding));
+            var result = await PostById(_dbContext.Holding, saveHoldingDto, nameof(GetHolding));
 
             if (!portfolio.Holdings.Contains(result.Value))
                 portfolio.Holdings.Add(result.Value);
@@ -55,7 +55,7 @@ namespace StocksApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHolding(Guid id)
         {
-            return await DeleteById(_dbContext.Holdings, id);
+            return await DeleteById(_dbContext.Holding, id);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace StocksApi.Controllers
         [HttpGet("{portfolioManagerId}")]
         public IQueryable<PortfolioManager> GetPortfolios(Guid portfolioManagerId)
         {
-            return _dbContext.PortfolioManagers
+            return _dbContext.PortfolioManager
                 .Where(p => p.Id == portfolioManagerId)
                 .Include(h => h.Portfolios)
                 .ThenInclude(p => p.Holdings);
@@ -33,25 +33,25 @@ namespace StocksApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Portfolio>> GetPortfolio(Guid id)
         {
-            return await GetById(_dbContext.Portfolios, id);
+            return await GetById(_dbContext.Portfolio, id);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPortfolio(Guid id, SavePortfolioDto savePortfolioDto)
         {
-            return await PutById(id, _dbContext.Portfolios, savePortfolioDto);
+            return await PutById(id, _dbContext.Portfolio, savePortfolioDto);
         }
 
         [HttpPost]
         public async Task<ActionResult<Portfolio>> PostPortfolio(SavePortfolioDto savePortfolioDto)
         {
-            var portfolioManager = _dbContext.PortfolioManagers
+            var portfolioManager = _dbContext.PortfolioManager
                 .SingleOrDefault(pm => pm.Id == savePortfolioDto.PortfolioManagerId);
 
             if (portfolioManager == null)
                 return NotFound();
 
-            var result = await PostById(_dbContext.Portfolios, savePortfolioDto, nameof(GetPortfolio));
+            var result = await PostById(_dbContext.Portfolio, savePortfolioDto, nameof(GetPortfolio));
 
             if (!portfolioManager.Portfolios.Contains(result.Value))
                 portfolioManager.Portfolios.Add(result.Value);
@@ -64,11 +64,11 @@ namespace StocksApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePortfolio(Guid id)
         {
-            var portfolio = await _dbContext.Portfolios.SingleOrDefaultAsync(e => e.Id == id);
+            var portfolio = await _dbContext.Portfolio.SingleOrDefaultAsync(e => e.Id == id);
 
-            _dbContext.Holdings.RemoveRange(portfolio.Holdings);
+            _dbContext.Holding.RemoveRange(portfolio.Holdings);
 
-            return await DeleteById(_dbContext.Portfolios, id);
+            return await DeleteById(_dbContext.Portfolio, id);
         }
     }
 }

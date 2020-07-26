@@ -80,7 +80,7 @@ namespace StocksApi.Data.Migrations
 
                     b.HasIndex("StockId");
 
-                    b.ToTable("Holdings");
+                    b.ToTable("Holding");
                 });
 
             modelBuilder.Entity("StocksApi.Model.Portfolio", b =>
@@ -99,7 +99,7 @@ namespace StocksApi.Data.Migrations
 
                     b.HasIndex("PortfolioManagerId");
 
-                    b.ToTable("Portfolios");
+                    b.ToTable("Portfolio");
                 });
 
             modelBuilder.Entity("StocksApi.Model.PortfolioManager", b =>
@@ -113,7 +113,7 @@ namespace StocksApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PortfolioManagers");
+                    b.ToTable("PortfolioManager");
                 });
 
             modelBuilder.Entity("StocksApi.Model.Stock", b =>

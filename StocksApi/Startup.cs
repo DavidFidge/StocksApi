@@ -74,8 +74,10 @@ namespace StocksApi
                 }
             });
 
-            var connectionString = Environment.GetEnvironmentVariable(Constants.StocksApiSeqUrl)
-                ?? Configuration.GetConnectionString("STOCKSAPI_STOCKSDBCONNECTIONSTRING");
+            var connectionString = Configuration.GetConnectionString(Constants.StocksApiStocksDbConnectionString);
+
+            if (String.IsNullOrEmpty(connectionString))
+                connectionString = Environment.GetEnvironmentVariable(Constants.StocksApiStocksDbConnectionString);
 
             services
                 .AddEntityFrameworkSqlite()

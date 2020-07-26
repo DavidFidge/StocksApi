@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace StocksApi.Data.Migrations
 {
-    public partial class init : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "PortfolioManagers",
+                name: "PortfolioManager",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -16,7 +16,7 @@ namespace StocksApi.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PortfolioManagers", x => x.Id);
+                    table.PrimaryKey("PK_PortfolioManager", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -34,7 +34,7 @@ namespace StocksApi.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Portfolios",
+                name: "Portfolio",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -43,11 +43,11 @@ namespace StocksApi.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Portfolios", x => x.Id);
+                    table.PrimaryKey("PK_Portfolio", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Portfolios_PortfolioManagers_PortfolioManagerId",
+                        name: "FK_Portfolio_PortfolioManager_PortfolioManagerId",
                         column: x => x.PortfolioManagerId,
-                        principalTable: "PortfolioManagers",
+                        principalTable: "PortfolioManager",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -77,7 +77,7 @@ namespace StocksApi.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Holdings",
+                name: "Holding",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -90,15 +90,15 @@ namespace StocksApi.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Holdings", x => x.Id);
+                    table.PrimaryKey("PK_Holding", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Holdings_Portfolios_PortfolioId",
+                        name: "FK_Holding_Portfolio_PortfolioId",
                         column: x => x.PortfolioId,
-                        principalTable: "Portfolios",
+                        principalTable: "Portfolio",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Holdings_Stock_StockId",
+                        name: "FK_Holding_Stock_StockId",
                         column: x => x.StockId,
                         principalTable: "Stock",
                         principalColumn: "Id",
@@ -111,18 +111,18 @@ namespace StocksApi.Data.Migrations
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Holdings_PortfolioId",
-                table: "Holdings",
+                name: "IX_Holding_PortfolioId",
+                table: "Holding",
                 column: "PortfolioId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Holdings_StockId",
-                table: "Holdings",
+                name: "IX_Holding_StockId",
+                table: "Holding",
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Portfolios_PortfolioManagerId",
-                table: "Portfolios",
+                name: "IX_Portfolio_PortfolioManagerId",
+                table: "Portfolio",
                 column: "PortfolioManagerId");
         }
 
@@ -132,16 +132,16 @@ namespace StocksApi.Data.Migrations
                 name: "EndOfDay");
 
             migrationBuilder.DropTable(
-                name: "Holdings");
+                name: "Holding");
 
             migrationBuilder.DropTable(
-                name: "Portfolios");
+                name: "Portfolio");
 
             migrationBuilder.DropTable(
                 name: "Stock");
 
             migrationBuilder.DropTable(
-                name: "PortfolioManagers");
+                name: "PortfolioManager");
         }
     }
 }
