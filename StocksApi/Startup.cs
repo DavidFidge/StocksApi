@@ -48,6 +48,8 @@ namespace StocksApi
                     builder =>
                     {
                         builder.WithOrigins("http://localhost:5000");
+                        builder.AllowAnyMethod();
+                        builder.AllowAnyHeader();
                     });
             });
 

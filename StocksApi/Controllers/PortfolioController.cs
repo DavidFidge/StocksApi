@@ -21,11 +21,14 @@ namespace StocksApi.Controllers
         {
         }
 
-        [HttpGet("{portfolioManagerId}")]
-        public IQueryable<PortfolioManager> GetPortfolios(Guid portfolioManagerId)
+        [HttpGet("Portfolios")]
+        public IQueryable<PortfolioManager> GetPortfolios()
         {
+            var portfolioManager = _dbContext.PortfolioManager
+                .Single();
+
             return _dbContext.PortfolioManager
-                .Where(p => p.Id == portfolioManagerId)
+                .Where(p => p.Id == portfolioManager.Id)
                 .Include(h => h.Portfolios)
                 .ThenInclude(p => p.Holdings);
         }
@@ -46,12 +49,14 @@ namespace StocksApi.Controllers
         public async Task<ActionResult<Portfolio>> PostPortfolio(SavePortfolioDto savePortfolioDto)
         {
             var portfolioManager = _dbContext.PortfolioManager
-                .SingleOrDefault(pm => pm.Id == savePortfolioDto.PortfolioManagerId);
-
-            if (portfolioManager == null)
-                return NotFound();
+                .Include(p => p.Portfolios)
+                .Single();
 
             var result = await PostById(_dbContext.Portfolio, savePortfolioDto, nameof(GetPortfolio));
+
+            var createdAtActionResult = result.Result as CreatedAtActionResult;
+
+            createdAtActionResult.Value as Portfolio;
 
             if (!portfolioManager.Portfolios.Contains(result.Value))
                 portfolioManager.Portfolios.Add(result.Value);
@@ -59,6 +64,17 @@ namespace StocksApi.Controllers
             await _dbContext.SaveChangesAsync();
 
             return result;
+        }
+
+        [HttpPost("PortfolioManager")]
+        public async Task<ActionResult<PortfolioManager>> PostPortfolioManager()
+        {
+            var portfolioManager = new PortfolioManager();
+
+            await _dbContext.PortfolioManager.AddAsync(portfolioManager);
+            await _dbContext.SaveChangesAsync();
+
+            return new ActionResult<PortfolioManager>(portfolioManager);
         }
 
         [HttpDelete("{id}")]
