@@ -2,7 +2,7 @@
 
 namespace StocksApi.Controllers
 {
-    public class SaveHoldingDto : BaseDto
+    public class HoldingDto : BaseDto
     {
         public string StockCode { get; set; }
         public DateTime PurchaseDate { get; set; }

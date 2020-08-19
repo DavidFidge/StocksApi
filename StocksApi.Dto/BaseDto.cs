@@ -2,7 +2,7 @@
 
 namespace StocksApi.Controllers
 {
-    public class BaseSaveDto
+    public class BaseDto
     {
         public Guid Id { get; set; }
     }

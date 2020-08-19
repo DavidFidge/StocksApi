@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using AutoMapper;
-
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +17,7 @@ namespace StocksApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StocksController : BaseController<StocksContext, SaveStockDto, Stock>
+    public class StocksController : BaseController<StocksContext, StockDto, SaveStockDto, Stock>
     {
         private readonly ICompanyInformation _companyInformation;
 
@@ -30,13 +30,14 @@ namespace StocksApi.Controllers
         [HttpGet]
         [EnableQuery(PageSize = 50)]
         [ODataRoute]
-        public IQueryable<Stock> GetStock()
+        public IQueryable<StockDto> GetStock()
         {
-            return _dbContext.Stock;
+            return _dbContext.Stock
+                .ProjectTo<StockDto>(_mapper.ConfigurationProvider);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Stock>> GetStock(Guid id)
+        public async Task<ActionResult<StockDto>> GetStock(Guid id)
         {
             return await GetById(_dbContext.Stock, id);
         }
@@ -56,7 +57,7 @@ namespace StocksApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Stock>> PostStock(SaveStockDto saveStockDto)
+        public async Task<IActionResult> PostStock(SaveStockDto saveStockDto)
         {
             return await PostById(_dbContext.Stock, saveStockDto, nameof(GetStock));
         }

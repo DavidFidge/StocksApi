@@ -2,7 +2,7 @@
 
 namespace StocksApi.Controllers
 {
-    public class SaveStockDto : BaseDto
+    public class StockDto : BaseDto
     {
         public string Code { get; set; }
         public string CompanyName { get; set; }

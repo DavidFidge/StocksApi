@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using AutoMapper;
-
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.EntityFrameworkCore;
 using StocksApi.Data;
 using StocksApi.Model;
 
@@ -14,15 +14,28 @@ namespace StocksApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HoldingController : BaseController<StocksContext, SaveHoldingDto, Holding>
+    public class HoldingController : BaseController<StocksContext, HoldingDto, SaveHoldingDto, Holding>
     {
         public HoldingController(StocksContext dbContext, IMapper mapper)
             : base(dbContext, mapper)
         {
         }
 
+        [HttpGet("Holdings")]
+        public IQueryable<HoldingDto> GetHoldings()
+        {
+            var portfolioManager = _dbContext.PortfolioManager
+                .Single();
+
+            return _dbContext.Portfolio
+                .Include(p => p.Holdings)
+                .Where(p => p.PortfolioManager == portfolioManager)
+                .SelectMany(p => p.Holdings)
+                .ProjectTo<HoldingDto>(_mapper.ConfigurationProvider);
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<Holding>> GetHolding(Guid id)
+        public async Task<ActionResult<HoldingDto>> GetHolding(Guid id)
         {
             return await GetById(_dbContext.Holding, id);
         }
@@ -34,22 +47,21 @@ namespace StocksApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Holding>> PostHolding(SaveHoldingDto saveHoldingDto)
+        public async Task<IActionResult> PostHolding(SaveHoldingDto saveHoldingDto)
         {
             var portfolio = _dbContext.Portfolio
-                .SingleOrDefault(p => p.Id == saveHoldingDto.PortfolioId);
+                .Single(p => p.Id == saveHoldingDto.PortfolioId);
 
-            if (portfolio == null)
-                return NotFound();
+            var holding = await PostById(_dbContext.Holding, saveHoldingDto);
+            
+            holding.Stock = _dbContext.Stock.Single(s => s.Code == saveHoldingDto.StockCode);;
 
-            var result = await PostById(_dbContext.Holding, saveHoldingDto, nameof(GetHolding));
-
-            if (!portfolio.Holdings.Contains(result.Value))
-                portfolio.Holdings.Add(result.Value);
+            if (!portfolio.Holdings.Contains(holding))
+                portfolio.Holdings.Add(holding);
 
             await _dbContext.SaveChangesAsync();
 
-            return result;
+            return GetCreatedAtAction(nameof(GetHolding), holding);
         }
 
         [HttpDelete("{id}")]

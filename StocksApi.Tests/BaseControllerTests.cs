@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using NSubstitute;
-
 using StocksApi.Controllers;
 using StocksApi.Model;
 using StocksApi.Service.Tests;
@@ -21,6 +19,7 @@ namespace StocksApi.Tests
         public TestProfile()
         {
             CreateMap<BaseControllerTests.TestSaveDto, BaseControllerTests.TestEntity>();
+            CreateMap<BaseControllerTests.TestEntity, BaseControllerTests.TestDto>();
         }
     }
 
@@ -55,7 +54,8 @@ namespace StocksApi.Tests
 
             var testEntity = new TestEntity
             {
-                Id = testEntityId
+                Id = testEntityId,
+                TestProperty = "Test"
             };
 
             SeedDatabase(testEntity);
@@ -64,10 +64,8 @@ namespace StocksApi.Tests
             var result = await _testBaseController.GetByIdTest(testEntityId);
 
             // Assert
-            using var testDbContext = new TestDbContext(ContextOptions);
-
-            Assert.AreEqual(1, testDbContext.TestEntities.Count());
-            Assert.AreEqual(testEntity, result.Value);
+            Assert.AreEqual(testEntity.Id, result.Value.Id);
+            Assert.AreEqual(testEntity.TestProperty, result.Value.TestProperty);
         }
 
         [TestMethod]
@@ -158,14 +156,15 @@ namespace StocksApi.Tests
             var result = await _testBaseController.PostByIdTest(testSaveDto, nameof(_testBaseController.GetByIdTest));
 
             // Assert
-            var createdAtActionResult = result.Result as CreatedAtActionResult;
+            var actionResult = result as CreatedAtActionResult;
 
-            Assert.IsNotNull(createdAtActionResult);
-            Assert.AreEqual(nameof(_testBaseController.GetByIdTest), createdAtActionResult.ActionName);
+            Assert.IsNotNull(actionResult);
+            Assert.AreEqual(nameof(_testBaseController.GetByIdTest), actionResult.ActionName);
+            Assert.IsNull(actionResult.Value);
 
-            var id = (Guid)createdAtActionResult.RouteValues["id"];
+            var id = (Guid)actionResult.RouteValues["id"];
 
-            Assert.AreEqual(id, createdAtActionResult.RouteValues["id"]);
+            Assert.AreEqual(id, actionResult.RouteValues["id"]);
 
             using var testDbContext = new TestDbContext(ContextOptions);
 
@@ -190,7 +189,7 @@ namespace StocksApi.Tests
             SeedDatabase(new List<TestEntity> { testEntity });
         }
 
-        public class TestBaseController : BaseController<TestDbContext, TestSaveDto, TestEntity>
+        public class TestBaseController : BaseController<TestDbContext, TestDto, TestSaveDto, TestEntity>
         {
             public TestBaseController(TestDbContext dbContext, IMapper mapper) 
                 : base(dbContext, mapper)
@@ -202,7 +201,7 @@ namespace StocksApi.Tests
                 return await DeleteById(_dbContext.TestEntities, id);
             }
 
-            public async Task<ActionResult<TestEntity>> GetByIdTest(Guid id)
+            public async Task<ActionResult<TestDto>> GetByIdTest(Guid id)
             {
                 return await GetById(_dbContext.TestEntities, id);
             }
@@ -212,13 +211,18 @@ namespace StocksApi.Tests
                 return await PutById(id, _dbContext.TestEntities, testSaveDto);
             }
 
-            public async Task<ActionResult<TestEntity>> PostByIdTest(TestSaveDto testSaveDto, string getActionName)
+            public async Task<IActionResult> PostByIdTest(TestSaveDto testSaveDto, string getActionName)
             {
                 return await PostById(_dbContext.TestEntities, testSaveDto, nameof(GetByIdTest));
             }
         }
 
-        public class TestSaveDto : BaseSaveDto
+        public class TestSaveDto : BaseDto
+        {
+            public string TestProperty { get; set; }
+        }
+
+        public class TestDto : BaseDto
         {
             public string TestProperty { get; set; }
         }

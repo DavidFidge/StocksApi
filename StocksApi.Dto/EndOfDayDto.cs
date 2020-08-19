@@ -2,7 +2,7 @@
 
 namespace StocksApi.Controllers
 {
-    public class SaveEndOfDayDto : BaseDto
+    public class EndOfDayDto : BaseDto
     {
         public string StockCode { get; set; }
         public Guid StockId { get; set; }

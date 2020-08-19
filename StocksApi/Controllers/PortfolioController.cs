@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using AutoMapper;
-
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StocksApi.Data;
@@ -14,7 +14,7 @@ namespace StocksApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PortfolioController : BaseController<StocksContext, SavePortfolioDto, Portfolio>
+    public class PortfolioController : BaseController<StocksContext, PortfolioDto, SavePortfolioDto, Portfolio>
     {
         public PortfolioController(StocksContext context, IMapper mapper)
             : base(context, mapper)
@@ -22,19 +22,18 @@ namespace StocksApi.Controllers
         }
 
         [HttpGet("Portfolios")]
-        public IQueryable<PortfolioManager> GetPortfolios()
+        public IQueryable<PortfolioDto> GetPortfolios()
         {
             var portfolioManager = _dbContext.PortfolioManager
                 .Single();
 
-            return _dbContext.PortfolioManager
-                .Where(p => p.Id == portfolioManager.Id)
-                .Include(h => h.Portfolios)
-                .ThenInclude(p => p.Holdings);
+            return _dbContext.Portfolio
+                .Where(p => p.PortfolioManager == portfolioManager)
+                .ProjectTo<PortfolioDto>(_mapper.ConfigurationProvider);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Portfolio>> GetPortfolio(Guid id)
+        public async Task<ActionResult<PortfolioDto>> GetPortfolio(Guid id)
         {
             return await GetById(_dbContext.Portfolio, id);
         }
@@ -46,29 +45,28 @@ namespace StocksApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Portfolio>> PostPortfolio(SavePortfolioDto savePortfolioDto)
+        public async Task<IActionResult> PostPortfolio(SavePortfolioDto savePortfolioDto)
         {
             var portfolioManager = _dbContext.PortfolioManager
                 .Include(p => p.Portfolios)
                 .Single();
 
-            var result = await PostById(_dbContext.Portfolio, savePortfolioDto, nameof(GetPortfolio));
+            var portfolio = await PostById(_dbContext.Portfolio, savePortfolioDto);
 
-            var createdAtActionResult = result.Result as CreatedAtActionResult;
-
-            createdAtActionResult.Value as Portfolio;
-
-            if (!portfolioManager.Portfolios.Contains(result.Value))
-                portfolioManager.Portfolios.Add(result.Value);
+            if (!portfolioManager.Portfolios.Contains(portfolio))
+                portfolioManager.Portfolios.Add(portfolio);
 
             await _dbContext.SaveChangesAsync();
 
-            return result;
+            return GetCreatedAtAction(nameof(GetPortfolio), portfolio);
         }
 
         [HttpPost("PortfolioManager")]
         public async Task<ActionResult<PortfolioManager>> PostPortfolioManager()
         {
+            if (_dbContext.PortfolioManager.Any())
+                return Ok();
+
             var portfolioManager = new PortfolioManager();
 
             await _dbContext.PortfolioManager.AddAsync(portfolioManager);

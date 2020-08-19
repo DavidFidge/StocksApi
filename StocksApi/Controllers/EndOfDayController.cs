@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using AutoMapper;
-
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +17,7 @@ namespace StocksApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EndOfDayController : BaseController<StocksContext, SaveEndOfDayDto, EndOfDay>
+    public class EndOfDayController : BaseController<StocksContext, EndOfDayDto, SaveEndOfDayDto, EndOfDay>
     {
         private readonly IEndOfDayUpdate _endOfDayUpdate;
 
@@ -29,15 +29,17 @@ namespace StocksApi.Controllers
         }
 
         [HttpGet]
-        [EnableQuery(PageSize = 3655)]
+        [EnableQuery(PageSize = 3655)]  // 10 years of data for a single stock
         [ODataRoute]
-        public IQueryable<EndOfDay> GetEndOfDays()
+        public IQueryable<EndOfDayDto> GetEndOfDays()
         {
-            return _dbContext.EndOfDay.Include(e => e.Stock);
+            return _dbContext.EndOfDay
+                .Include(e => e.Stock)
+                .ProjectTo<EndOfDayDto>(_mapper.ConfigurationProvider);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EndOfDay>> GetEndOfDay(Guid id)
+        public async Task<ActionResult<EndOfDayDto>> GetEndOfDay(Guid id)
         {
             return await GetById(_dbContext.EndOfDay, id);
         }
@@ -49,7 +51,7 @@ namespace StocksApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<EndOfDay>> PostEndOfDay(SaveEndOfDayDto saveEndOfDayDto)
+        public async Task<IActionResult> PostEndOfDay(SaveEndOfDayDto saveEndOfDayDto)
         {
             var result = await PostById(_dbContext.EndOfDay, saveEndOfDayDto, nameof(GetEndOfDay));
 
@@ -73,8 +75,6 @@ namespace StocksApi.Controllers
 
             if (stock == null)
                 return NotFound();
-
-            result.Value.Stock = stock;
 
             await _dbContext.SaveChangesAsync();
 

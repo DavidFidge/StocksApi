@@ -82,11 +82,15 @@ namespace StocksApi
                 connectionString = Environment.GetEnvironmentVariable(Constants.StocksApiStocksDbConnectionString);
 
             services
-                .AddEntityFrameworkSqlite()
-                .AddDbContext<StocksContext>( o =>
-                    o.UseSqlite(connectionString)
-                        .EnableSensitiveDataLogging()
-                    );
+                .AddDbContext<StocksContext>(
+                    o =>
+                    {
+                        o.UseSqlite(connectionString);
+
+                        if (Constants.TrueOrOne.Contains(Environment.GetEnvironmentVariable(Constants.StocksApiSensitiveLogging)?.ToLower()))
+                            o.EnableSensitiveDataLogging();
+                    }
+                );
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }

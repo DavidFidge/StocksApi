@@ -14,9 +14,10 @@ namespace StocksApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public abstract class BaseController<TContext, TSaveDto, TEntity> : ControllerBase
+    public abstract class BaseController<TContext, TDto, TSaveDto, TEntity> : ControllerBase
         where TContext : DbContext
-        where TSaveDto : BaseSaveDto
+        where TDto : BaseDto
+        where TSaveDto : BaseDto
         where TEntity : Entity
     {
         protected readonly IMapper _mapper;
@@ -45,15 +46,26 @@ namespace StocksApi.Controllers
             return NoContent();
         }
 
-        protected async Task<ActionResult<TEntity>> PostById(DbSet<TEntity> dbSet, TSaveDto saveDto, string getActionName)
+        protected async Task<IActionResult> PostById(DbSet<TEntity> dbSet, TSaveDto saveDto, string getActionName)
+        {
+            var entity = await PostById(dbSet, saveDto);
+
+            return GetCreatedAtAction(getActionName, entity);
+        }
+
+        protected IActionResult GetCreatedAtAction(string getActionName, TEntity entity)
+        {
+            return CreatedAtAction(getActionName, new { id = entity.Id }, null);
+        }
+
+        protected async Task<TEntity> PostById(DbSet<TEntity> dbSet, TSaveDto saveDto)
         {
             var entity = _mapper.Map<TSaveDto, TEntity>(saveDto);
 
-            _dbContext.Add(entity);
+            dbSet.Add(entity);
 
             await _dbContext.SaveChangesAsync();
-
-            return CreatedAtAction(getActionName, new { id = entity.Id }, entity);
+            return entity;
         }
 
         protected async Task<IActionResult> DeleteById(DbSet<TEntity> dbSet, Guid id)
@@ -70,14 +82,14 @@ namespace StocksApi.Controllers
             return NoContent();
         }
 
-        protected async Task<ActionResult<TEntity>> GetById(DbSet<TEntity> dbSet, Guid id)
+        protected async Task<ActionResult<TDto>> GetById(DbSet<TEntity> dbSet, Guid id)
         {
             var entity = await dbSet.SingleOrDefaultAsync(e => e.Id == id);
 
             if (entity == null)
                 return NotFound();
 
-            return entity;
+            return _mapper.Map<TDto>(entity);
         }
     }
 }
