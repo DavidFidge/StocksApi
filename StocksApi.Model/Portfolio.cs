@@ -7,6 +7,7 @@ namespace StocksApi.Model
     {
         public PortfolioManager PortfolioManager { get; set; }
         public string Name { get; set; }
+        public string HolderIdentificationNumber { get; set; }
         public List<Holding> Holdings { get; set; }
 
         public Portfolio()

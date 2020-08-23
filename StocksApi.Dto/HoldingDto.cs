@@ -10,5 +10,6 @@ namespace StocksApi.Controllers
         public Decimal PurchasePrice { get; set; }
         public Decimal Brokerage { get; set; }
         public Guid PortfolioId { get; set; }
+        public string PortfolioName { get; set; }
     }
 }
