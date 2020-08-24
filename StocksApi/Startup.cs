@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+
+using AutoMapper;
 
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Builder;
@@ -45,6 +48,8 @@ namespace StocksApi
                     builder =>
                     {
                         builder.WithOrigins("http://localhost:5000");
+                        builder.AllowAnyMethod();
+                        builder.AllowAnyHeader();
                     });
             });
 
@@ -71,15 +76,23 @@ namespace StocksApi
                 }
             });
 
-            var connectionString = Environment.GetEnvironmentVariable(Constants.StocksApiSeqUrl)
-                ?? Configuration.GetConnectionString("STOCKSAPI_STOCKSDBCONNECTIONSTRING");
+            var connectionString = Configuration.GetConnectionString(Constants.StocksApiStocksDbConnectionString);
+
+            if (String.IsNullOrEmpty(connectionString))
+                connectionString = Environment.GetEnvironmentVariable(Constants.StocksApiStocksDbConnectionString);
 
             services
-                .AddEntityFrameworkSqlite()
-                .AddDbContext<StocksContext>( o =>
-                    o.UseSqlite(connectionString)
-                        .EnableSensitiveDataLogging()
-                    );
+                .AddDbContext<StocksContext>(
+                    o =>
+                    {
+                        o.UseSqlite(connectionString);
+
+                        if (Constants.TrueOrOne.Contains(Environment.GetEnvironmentVariable(Constants.StocksApiSensitiveLogging)?.ToLower()))
+                            o.EnableSensitiveDataLogging();
+                    }
+                );
+
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

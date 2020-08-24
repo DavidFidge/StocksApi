@@ -34,7 +34,7 @@ namespace StocksApi.Service.EndOfDayData
 
             DeleteExistingEndOfDaysForSameDates(endOfDays, stocksContext);
 
-            stocksContext.AddRange(endOfDays);
+            stocksContext.EndOfDay.AddRange(endOfDays);
             stocksContext.SaveChanges();
         }
 
@@ -49,7 +49,7 @@ namespace StocksApi.Service.EndOfDayData
                 .Where(e => endOfDayDates.Contains(e.Date))
                 .ToList();
 
-            stocksContext.RemoveRange(endOfDaysToDelete);
+            stocksContext.EndOfDay.RemoveRange(endOfDaysToDelete);
             stocksContext.SaveChanges();
         }
 
@@ -91,7 +91,7 @@ namespace StocksApi.Service.EndOfDayData
                 .Except(allStocks, Stock.EqualityComparer)
                 .ToList();
 
-            stocksContext.AddRange(newStocks);
+            stocksContext.Stock.AddRange(newStocks);
 
             return endOfDays;
         }
@@ -103,11 +103,7 @@ namespace StocksApi.Service.EndOfDayData
             if (stock != null)
                 return stock;
 
-            stock = new Stock
-            {
-                Code = stockCode,
-                CompanyName = stockCode
-            };
+            stock = Stock.CreateDefault(stockCode);
 
             allStocks.Add(stock);
 

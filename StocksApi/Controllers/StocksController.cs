@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
 using StocksApi.Data;
 using StocksApi.Model;
 using StocksApi.Service.Companies;
@@ -14,111 +17,55 @@ namespace StocksApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StocksController : ControllerBase
+    public class StocksController : BaseController<StocksContext, StockDto, SaveStockDto, Stock>
     {
-        private readonly StocksContext _context;
         private readonly ICompanyInformation _companyInformation;
 
-        public StocksController(StocksContext context, ICompanyInformation companyInformation)
+        public StocksController(StocksContext dbContext, ICompanyInformation companyInformation, IMapper mapper)
+            : base(dbContext, mapper)
         {
-            _context = context;
             _companyInformation = companyInformation;
         }
 
-        // GET: api/StocksController
         [HttpGet]
         [EnableQuery(PageSize = 50)]
         [ODataRoute]
-        public IQueryable<Stock> GetStock()
+        public IQueryable<StockDto> GetStock()
         {
-            return _context.Stock;
+            return _dbContext.Stock
+                .ProjectTo<StockDto>(_mapper.ConfigurationProvider);
         }
 
-        // GET: api/StocksController/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Stock>> GetStock(Guid id)
+        public async Task<ActionResult<StockDto>> GetStock(Guid id)
         {
-            var stock = await _context.Stock.FindAsync(id);
-
-            if (stock == null)
-            {
-                return NotFound();
-            }
-
-            return stock;
+            return await GetById(_dbContext.Stock, id);
         }
 
-        // PUT: api/StocksController/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStock(Guid id, Stock stock)
+        public async Task<IActionResult> PutStock(Guid id, SaveStockDto saveStockDto)
         {
-            if (id != stock.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(stock).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StockExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return await PutById(id, _dbContext.Stock, saveStockDto);
         }
 
         [HttpPost("Update")]
-        public async Task<ActionResult<Stock>> Update()
+        public async Task<IActionResult> UpdateFromThirdParty()
         {
-            await _companyInformation.Update(_context);
+            await _companyInformation.Update(_dbContext);
 
             return NoContent();
         }
 
-        // POST: api/StocksController
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Stock>> PostStock(Stock stock)
+        public async Task<IActionResult> PostStock(SaveStockDto saveStockDto)
         {
-            _context.Stock.Add(stock);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetStock", new { id = stock.Id }, stock);
+            return await PostById(_dbContext.Stock, saveStockDto, nameof(GetStock));
         }
 
-        // DELETE: api/StocksController/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Stock>> DeleteStock(Guid id)
+        public async Task<IActionResult> DeleteStock(Guid id)
         {
-            var stock = await _context.Stock.FindAsync(id);
-            if (stock == null)
-            {
-                return NotFound();
-            }
-
-            _context.Stock.Remove(stock);
-            await _context.SaveChangesAsync();
-
-            return stock;
-        }
-
-        private bool StockExists(Guid id)
-        {
-            return _context.Stock.Any(e => e.Id == id);
+            return await DeleteById(_dbContext.Stock, id);
         }
     }
 }

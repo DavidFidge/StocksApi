@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using NSubstitute;
@@ -15,10 +14,9 @@ using StocksApi.Service.EndOfDayData;
 namespace StocksApi.Service.Tests
 {
     [TestClass]
-    public class EndOfDayUpdateTests : BaseTest<EndOfDayUpdate>
+    public class EndOfDayUpdateTests : BaseSqlLiteTest<EndOfDayUpdate, StocksContext>
     {
         private IEndOfDayStore _endOfDayStore;
-        private StocksContext _stocksContext;
         private EndOfDayUpdate _endOfDayUpdate;
 
         [TestInitialize]
@@ -26,8 +24,11 @@ namespace StocksApi.Service.Tests
         {
             base.Setup();
 
+            using var stocksContext = new StocksContext(ContextOptions);
+
+            SetupDatabase(stocksContext);
+
             _endOfDayStore = Substitute.For<IEndOfDayStore>();
-            _stocksContext = Substitute.For<StocksContext>();
             
             _endOfDayUpdate = new EndOfDayUpdate(Logger, _endOfDayStore);
         }
@@ -36,7 +37,7 @@ namespace StocksApi.Service.Tests
         public async Task Update_Should_Add_New_EndOfDay_Record()
         {
             // Arrange
-            var stocks = new List<Stock>
+            var arrangeStocks = new List<Stock>
             {
                 new Stock
                 {
@@ -44,19 +45,11 @@ namespace StocksApi.Service.Tests
                 }
             };
 
-            var dbSetStocks = Substitute.For<DbSet<Stock>, IQueryable<Stock>>()
-                .Initialize(stocks)
-                .WithAddRemove(stocks, _stocksContext);
-
-            _stocksContext.Stock = dbSetStocks;
-
-            var endOfDayEntities = new List<EndOfDay>();
-
-            var dbSetEndOfDays = Substitute.For<DbSet<EndOfDay>, IQueryable<EndOfDay>>()
-                .Initialize(endOfDayEntities)
-                .WithAddRemove(endOfDayEntities, _stocksContext);
-
-            _stocksContext.EndOfDay = dbSetEndOfDays;
+            using (var arrangeStocksContext = new StocksContext(ContextOptions))
+            {
+                arrangeStocksContext.Stock.AddRange(arrangeStocks);
+                arrangeStocksContext.SaveChanges();
+            }
 
             var endOfDays = new List<string>
             {
@@ -68,9 +61,19 @@ namespace StocksApi.Service.Tests
                 .Returns(endOfDays);
 
             // Act
-            await _endOfDayUpdate.Update(_stocksContext);
-
+            using (var actStocksContext = new StocksContext(ContextOptions))
+            {
+                await _endOfDayUpdate.Update(actStocksContext);
+            }
+            
             // Assert
+            using var stocksContext = new StocksContext(ContextOptions);
+
+            var endOfDayEntities = stocksContext.EndOfDay.ToList();
+
+            var stocks = stocksContext.Stock.ToList();
+
+
             Assert.AreEqual(1, endOfDayEntities.Count);
 
             Assert.AreEqual(stocks[0], endOfDayEntities[0].Stock);
@@ -81,22 +84,6 @@ namespace StocksApi.Service.Tests
         public async Task Update_Should_Add_New_EndOfDay_Records_With_New_Placeholder_Stock_If_Not_Exists()
         {
             // Arrange
-            var stocks = new List<Stock>();
-
-            var dbSetStocks = Substitute.For<DbSet<Stock>, IQueryable<Stock>>()
-                .Initialize(stocks)
-                .WithAddRemove(stocks, _stocksContext);
-
-            _stocksContext.Stock = dbSetStocks;
-
-            var endOfDayEntities = new List<EndOfDay>();
-
-            var dbSetEndOfDays = Substitute.For<DbSet<EndOfDay>, IQueryable<EndOfDay>>()
-                .Initialize(endOfDayEntities)
-                .WithAddRemove(endOfDayEntities, _stocksContext);
-
-            _stocksContext.EndOfDay = dbSetEndOfDays;
-
             var endOfDays = new List<string>
             {
                 "111,20200203,3.28,3.29,3.15,3.17,96249"
@@ -107,9 +94,18 @@ namespace StocksApi.Service.Tests
                 .Returns(endOfDays);
 
             // Act
-            await _endOfDayUpdate.Update(_stocksContext);
+            using (var actStocksContext = new StocksContext(ContextOptions))
+            {
+                await _endOfDayUpdate.Update(actStocksContext);
+            }
 
             // Assert
+            using var stocksContext = new StocksContext(ContextOptions);
+
+            var endOfDayEntities = stocksContext.EndOfDay.ToList();
+
+            var stocks = stocksContext.Stock.ToList();
+
             Assert.AreEqual(1, stocks.Count);
             var stock = stocks[0];
 
@@ -127,7 +123,7 @@ namespace StocksApi.Service.Tests
         public async Task Update_Should_Add_New_EndOfDay_Record_For_Multiple_Days()
         {
             // Arrange
-            var stocks = new List<Stock>
+            var arrangeStocks = new List<Stock>
             {
                 new Stock
                 {
@@ -135,19 +131,11 @@ namespace StocksApi.Service.Tests
                 }
             };
 
-            var dbSetStocks = Substitute.For<DbSet<Stock>, IQueryable<Stock>>()
-                .Initialize(stocks)
-                .WithAddRemove(stocks, _stocksContext);
-
-            _stocksContext.Stock = dbSetStocks;
-
-            var endOfDayEntities = new List<EndOfDay>();
-
-            var dbSetEndOfDays = Substitute.For<DbSet<EndOfDay>, IQueryable<EndOfDay>>()
-                .Initialize(endOfDayEntities)
-                .WithAddRemove(endOfDayEntities, _stocksContext);
-
-            _stocksContext.EndOfDay = dbSetEndOfDays;
+            using (var arrangeStocksContext = new StocksContext(ContextOptions))
+            {
+                arrangeStocksContext.Stock.AddRange(arrangeStocks);
+                arrangeStocksContext.SaveChanges();
+            }
 
             var endOfDays = new List<string>
             {
@@ -160,9 +148,18 @@ namespace StocksApi.Service.Tests
                 .Returns(endOfDays);
 
             // Act
-            await _endOfDayUpdate.Update(_stocksContext);
+            using (var actStocksContext = new StocksContext(ContextOptions))
+            {
+                await _endOfDayUpdate.Update(actStocksContext);
+            }
 
             // Assert
+            using var stocksContext = new StocksContext(ContextOptions);
+
+            var endOfDayEntities = stocksContext.EndOfDay.ToList();
+
+            var stocks = stocksContext.Stock.ToList();
+
             Assert.AreEqual(2, endOfDayEntities.Count);
 
             Assert.AreEqual(stocks[0], endOfDayEntities[0].Stock);
@@ -176,7 +173,7 @@ namespace StocksApi.Service.Tests
         public async Task Update_Should_Replace_EndOfDay_Records()
         {
             // Arrange
-            var stocks = new List<Stock>
+            var arrangeStocks = new List<Stock>
             {
                 new Stock
                 {
@@ -185,19 +182,13 @@ namespace StocksApi.Service.Tests
                 }
             };
 
-            var dbSetStocks = Substitute.For<DbSet<Stock>, IQueryable<Stock>>()
-                .Initialize(stocks)
-                .WithAddRemove(stocks, _stocksContext);
-
-            _stocksContext.Stock = dbSetStocks;
-
-            var endOfDayEntities = new List<EndOfDay>
+            var arrangeEndOfDayEntities = new List<EndOfDay>
             {
                 new EndOfDay
                 {
                     Id = Guid.NewGuid(),
                     Date = new DateTime(2020, 2, 3),
-                    Stock = stocks.First(),
+                    Stock = arrangeStocks.First(),
                     Open = 0.1m,
                     High = 0.2m,
                     Low = 0.05m,
@@ -208,7 +199,7 @@ namespace StocksApi.Service.Tests
                 {
                     Id = Guid.NewGuid(),
                     Date = new DateTime(2020, 2, 4),
-                    Stock = stocks.First(),
+                    Stock = arrangeStocks.First(),
                     Open = 0.01m,
                     High = 0.02m,
                     Low = 0.005m,
@@ -217,11 +208,14 @@ namespace StocksApi.Service.Tests
                 }
             };
 
-            var dbSetEndOfDays = Substitute.For<DbSet<EndOfDay>, IQueryable<EndOfDay>>()
-                .Initialize(endOfDayEntities)
-                .WithAddRemove(endOfDayEntities, _stocksContext);
+            using (var arrangeStocksContext = new StocksContext(ContextOptions))
+            {
+                arrangeStocksContext.Stock.AddRange(arrangeStocks);
+                arrangeStocksContext.EndOfDay.AddRange(arrangeEndOfDayEntities);
 
-            _stocksContext.EndOfDay = dbSetEndOfDays;
+                arrangeStocksContext.SaveChanges();
+
+            }
 
             var endOfDays = new List<string>
             {
@@ -233,9 +227,18 @@ namespace StocksApi.Service.Tests
                 .Returns(endOfDays);
 
             // Act
-            await _endOfDayUpdate.Update(_stocksContext);
+            using (var actStocksContext = new StocksContext(ContextOptions))
+            {
+                await _endOfDayUpdate.Update(actStocksContext);
+            }
 
             // Assert
+            using var stocksContext = new StocksContext(ContextOptions);
+
+            var endOfDayEntities = stocksContext.EndOfDay.ToList();
+
+            var stocks = stocksContext.Stock.ToList();
+
             Assert.AreEqual(1, stocks.Count);
 
             Assert.AreEqual(2, endOfDayEntities.Count);

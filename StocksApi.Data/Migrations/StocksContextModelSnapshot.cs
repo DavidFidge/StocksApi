@@ -50,6 +50,75 @@ namespace StocksApi.Data.Migrations
                     b.ToTable("EndOfDay");
                 });
 
+            modelBuilder.Entity("StocksApi.Model.Holding", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Brokerage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("NumberOfShares")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("PortfolioId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("PurchasePrice")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("StockId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PortfolioId");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("Holding");
+                });
+
+            modelBuilder.Entity("StocksApi.Model.Portfolio", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HolderIdentificationNumber")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("PortfolioManagerId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PortfolioManagerId");
+
+                    b.ToTable("Portfolio");
+                });
+
+            modelBuilder.Entity("StocksApi.Model.PortfolioManager", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PortfolioManager");
+                });
+
             modelBuilder.Entity("StocksApi.Model.Stock", b =>
                 {
                     b.Property<Guid>("Id")
@@ -75,6 +144,24 @@ namespace StocksApi.Data.Migrations
                     b.HasOne("StocksApi.Model.Stock", "Stock")
                         .WithMany()
                         .HasForeignKey("StockId");
+                });
+
+            modelBuilder.Entity("StocksApi.Model.Holding", b =>
+                {
+                    b.HasOne("StocksApi.Model.Portfolio", "Portfolio")
+                        .WithMany("Holdings")
+                        .HasForeignKey("PortfolioId");
+
+                    b.HasOne("StocksApi.Model.Stock", "Stock")
+                        .WithMany()
+                        .HasForeignKey("StockId");
+                });
+
+            modelBuilder.Entity("StocksApi.Model.Portfolio", b =>
+                {
+                    b.HasOne("StocksApi.Model.PortfolioManager", "PortfolioManager")
+                        .WithMany("Portfolios")
+                        .HasForeignKey("PortfolioManagerId");
                 });
 #pragma warning restore 612, 618
         }
