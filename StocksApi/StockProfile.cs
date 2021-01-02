@@ -20,6 +20,9 @@ namespace StocksApi
 
             CreateMap<SaveStockDto, Stock>();
             CreateMap<Stock, StockDto>();
+            
+            CreateMap<SaveDividendDto, Dividend>();
+            CreateMap<Dividend, DividendDto>();
         }
     }
 }

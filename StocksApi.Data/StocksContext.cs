@@ -11,6 +11,7 @@ namespace StocksApi.Data
         public virtual DbSet<PortfolioManager> PortfolioManager { get; set; }
         public virtual DbSet<Portfolio> Portfolio { get; set; }
         public virtual DbSet<Holding> Holding { get; set; }
+        public virtual DbSet<Dividend> Dividend { get; set; }
 
         public StocksContext()
         {
