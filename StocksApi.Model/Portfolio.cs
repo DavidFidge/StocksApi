@@ -9,10 +9,12 @@ namespace StocksApi.Model
         public string Name { get; set; }
         public string HolderIdentificationNumber { get; set; }
         public List<Holding> Holdings { get; set; }
+        public List<Dividend> Dividends { get; set; }
 
         public Portfolio()
         {
             Holdings = new List<Holding>();
+            Dividends = new List<Dividend>();
         }
     }
 }
