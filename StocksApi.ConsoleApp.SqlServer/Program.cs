@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StocksApi.ConsoleApp
+namespace StocksApi.ConsoleApp.SqlServer
 {
     class Program
     {

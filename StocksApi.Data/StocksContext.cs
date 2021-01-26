@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+
+using Microsoft.EntityFrameworkCore;
 
 using StocksApi.Model;
 
@@ -17,18 +19,9 @@ namespace StocksApi.Data
         {
         }
 
-        public StocksContext(DbContextOptions<StocksContext> options)
+        public StocksContext(DbContextOptions options)
         : base(options)
         {
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (optionsBuilder.IsConfigured)
-                return;
-
-            // Only used for command line tools
-            optionsBuilder.UseSqlite("Filename=Stocks.db");
         }
     }
 }

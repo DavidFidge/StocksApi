@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "StocksApi.Migrations.Sqlite": {
+      "commandName": "Project"
+    }
+  }
+}

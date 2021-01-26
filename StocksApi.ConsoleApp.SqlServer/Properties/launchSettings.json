@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "StocksApi.ConsoleApp.SqlServer": {
+      "commandName": "Project"
+    }
+  }
+}

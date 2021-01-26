@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "StocksApi.Migrations.SqlServer": {
+      "commandName": "Project"
+    }
+  }
+}

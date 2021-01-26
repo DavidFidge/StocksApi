@@ -86,9 +86,9 @@ namespace StocksApi
             if (String.IsNullOrEmpty(connectionString))
                 connectionString = Environment.GetEnvironmentVariable(Constants.StocksApiStocksDbConnectionString);
 
-            services
-                .AddDbContext<StocksContext>(
-                    o =>
+            if (Environment.GetEnvironmentVariable(Constants.AspNetCoreEnvironment) == Constants.AspNetCoreEnvironmentDevelopment)
+            {
+                services.AddDbContext<StocksContext>(o =>
                     {
                         o.UseSqlite(connectionString);
 
@@ -96,6 +96,19 @@ namespace StocksApi
                             o.EnableSensitiveDataLogging();
                     }
                 );
+            }
+            else
+            {
+                services.AddDbContext<StocksContext>(o =>
+                    {
+                        o.UseSqlServer(connectionString);
+
+                        if (Constants.TrueOrOne.Contains(Environment.GetEnvironmentVariable(Constants.StocksApiSensitiveLogging)?.ToLower()))
+                            o.EnableSensitiveDataLogging();
+                    }
+                );
+            }
+
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }

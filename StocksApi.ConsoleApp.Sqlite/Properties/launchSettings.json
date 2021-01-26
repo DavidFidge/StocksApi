@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "StocksApi.ConsoleApp.Sqlite": {
+      "commandName": "Project"
+    }
+  }
+}
