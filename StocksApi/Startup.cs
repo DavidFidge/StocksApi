@@ -36,6 +36,11 @@ namespace StocksApi
 
         public void ConfigureServices(IServiceCollection services)
         {
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .CreateLogger();
+
+            services.AddSingleton(Log.Logger);
             services.AddSingleton<IEndOfDayUpdate, EndOfDayUpdate>();
             services.AddSingleton<ICompanyInformation, CompanyInformation>();
             services.AddSingleton<ICompanyInformationStore, AsxCompanyInformationStore>();
