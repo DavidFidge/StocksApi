@@ -20,6 +20,9 @@ jobs:
       with:
         dotnet-version: '3.1.102'
 
+    - name: Restore with dotnet
+      run: dotnet restore
+
     - name: Build with dotnet
       run: dotnet build ./StocksApi/StocksApi.csproj --configuration Release
 
