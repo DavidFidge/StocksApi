@@ -20,6 +20,7 @@ using Serilog;
 
 using StocksApi.Core;
 using StocksApi.Data;
+using StocksApi.Extensions;
 using StocksApi.Service.Companies;
 using StocksApi.Service.EndOfDayData;
 
@@ -49,16 +50,23 @@ namespace StocksApi
             services.AddSingleton<IEndOfDayUpdate, EndOfDayUpdate>();
             services.AddSingleton<IEndOfDayStore, FileEndOfDayStore>();
 
-            services.AddCors(options =>
+            var origin = Configuration.GetValueOrEnvironmentVariable(Constants.StocksApiClientApplicationOrigin);
+
+            // CORS config for Azure is done in the portal, not in code
+            if (!String.IsNullOrEmpty(origin))
             {
-                options.AddDefaultPolicy(
-                    builder =>
+                services.AddCors(
+                    options =>
                     {
-                        builder.WithOrigins("http://localhost:5000");
-                        builder.AllowAnyMethod();
-                        builder.AllowAnyHeader();
+                        options.AddDefaultPolicy(
+                            builder =>
+                            {
+                                builder.WithOrigins(origin);
+                                builder.AllowAnyMethod();
+                                builder.AllowAnyHeader();
+                            });
                     });
-            });
+            }
 
             services.AddOData();
             services.AddControllers();
