@@ -119,8 +119,7 @@ namespace StocksApi
                 );
             }
 
-
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(mc => mc.AddProfile(new StockProfile()));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StocksApi.Migrations.Sqlite
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StocksApi.Migrations.SqlServer", "StocksApi.Migrations.SqlServer\StocksApi.Migrations.SqlServer.csproj", "{55591E62-F1EC-4929-B661-04D16D111C6B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StocksApi.Controllers", "StocksApi.Controllers\StocksApi.Controllers.csproj", "{A2B18844-348C-47B1-81E4-97384ABE5636}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{55591E62-F1EC-4929-B661-04D16D111C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55591E62-F1EC-4929-B661-04D16D111C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55591E62-F1EC-4929-B661-04D16D111C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2B18844-348C-47B1-81E4-97384ABE5636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2B18844-348C-47B1-81E4-97384ABE5636}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2B18844-348C-47B1-81E4-97384ABE5636}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2B18844-348C-47B1-81E4-97384ABE5636}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
